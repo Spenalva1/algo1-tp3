@@ -6,10 +6,24 @@
 
 #define RANKING "ranking"
 #define CAMINO "crear_camino"
-#define CONFIGURACION "crear_configuarcion"
+#define CONFIGURACION "crear_configuracion"
 #define REPE "poneme_la_repe"
 #define JUGAR "jugar"
 #define TXT ".txt"
+#define MAX_RUTA 30
+
+bool es_txt_valido(char ruta[MAX_RUTA]){
+    if(strcmp(ruta+strlen(ruta)-4, TXT)==0){
+        if(strlen(ruta) > 4){
+            return true;
+        }else{
+            printf("Debe ingresar al menos un caracter además de la terminación '.txt'.\n");
+        }
+    }else{
+        printf("Debe ingresar un nombre de archivo terminado en '.txt'.\n");
+    }
+    return false;
+}
 
 int main(int argc, char *argv[]){
     if(argc > 1){
@@ -19,21 +33,21 @@ int main(int argc, char *argv[]){
             comando_valido = true;
         }else if(strcmp(CAMINO, argv[1]) == 0){
             if(argc > 2){
-                if(strlen(argv[2]) > 4){
-                    if(strcmp(argv[2]+strlen(argv[2])-4, TXT)==0){
-                        crear_camino(argv[2]);
-                    }else{
-                        printf("Debe ingresar un nombre de archivo terminado en '.txt'.\n");
-                    }
-                }else{
-                    printf("Debe ingresar al menos un caracter además de la terminación '.txt'.\n");
+                if(es_txt_valido(argv[2])){
+                    crear_camino(argv[2]);
                 }
             }else{
                 printf("Debe ingresar el nombre de archivo para guardar el camino.\n");
             }
             comando_valido = true;
         }else if(strcmp(CONFIGURACION, argv[1]) == 0){
-            printf("CREAR CONFIGURACION\n");
+            if(argc > 2){
+                if(es_txt_valido(argv[2])){
+                    crear_configuracion(argv[2]);
+                }
+            }else{
+                printf("Debe ingresar el nombre de archivo para guardar la configuración.\n");
+            }
             comando_valido = true;
         }else if(strcmp(REPE, argv[1]) == 0){
             printf("REPE\n");

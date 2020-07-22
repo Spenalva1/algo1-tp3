@@ -30,6 +30,29 @@
 #define DERECHA 'D'
 #define IZQUIERDA 'A'
 #define ABAJO 'S'
+#define RESISTENCIA_TORRE_MINIMA 50
+#define RESISTENCIA_TORRE_MAXIMA 10000
+#define DEFENSORES_MINIMOS 2
+#define DEFENSORES_MAXIMOS 15
+#define EXTRAS_MINIMOS 0
+#define EXTRAS_MAXIMOS 20
+#define COSTE_EXTRAS_MINIMO 0
+#define COSTE_EXTRAS_MAXIMO 150
+#define PORCENTAJE_MINIMO 1
+#define PORCENTAJE_MAXIMO 99
+#define POR_DEFECTO -1
+#define VELOCIDAD_MINIMA 0.5
+#define VELOCIDAD_MAXIMA 5.0
+#define MAX_RUTA 30
+#define CLAVE_RESISTENCIA_TORRES "RESISTENCIA_TORRES"
+#define CLAVE_ENANOS_INICIO "ENANOS_INICIO"
+#define CLAVE_ELFOS_INICIO "ELFOS_INICIO"
+#define CLAVE_ENANOS_EXTRA "ENANOS_EXTRA"
+#define CLAVE_ELFOS_EXTRA "ELFOS_EXTRA"
+#define CLAVE_ENANOS_ANIMO "ENANOS_ANIMO"
+#define CLAVE_ELFOS_ANIMO "ELFOS_ANIMO"
+#define CLAVE_VELOCIDAD "VELOCIDAD"
+#define CLAVE_CAMINOS "CAMINOS"
 
 typedef struct nivel_caminos {
     int numero_nivel;
@@ -43,6 +66,33 @@ typedef struct nivel_caminos {
     int tope_filas;
     int tope_columnas;
 } nivel_caminos_t;
+
+typedef struct configuracion{
+    int resistencia_torre_1;
+    int resistencia_torre_2;
+    int enanos_nivel_1;
+    int enanos_nivel_2;
+    int enanos_nivel_3;
+    int enanos_nivel_4;
+    int elfos_nivel_1;
+    int elfos_nivel_2;
+    int elfos_nivel_3;
+    int elfos_nivel_4;
+    int enanos_extra;
+    int enanos_coste_torre_1;
+    int enanos_coste_torre_2;
+    int elfos_extra;
+    int elfos_coste_torre_1;
+    int elfos_coste_torre_2;
+    int enanos_fallo;
+    int enanos_critico;
+    int elfos_fallo;
+    int elfos_critico;
+    float velocidad_juego;
+    char caminos[MAX_RUTA];
+    char repeticion[MAX_RUTA];
+} configuracion_t;
+
 
 /* 
 *	Representa el camino con caracteres CAMINO en una matriz tablero ya inicializada
@@ -379,6 +429,9 @@ bool pedir_camino(nivel_caminos_t* nivel_caminos, int camino){
     return false;
 }
 
+/*
+*
+*/
 void definir_limites(nivel_caminos_t* nivel_caminos){
 	switch (nivel_caminos->numero_nivel){
 		case 1:
@@ -405,12 +458,67 @@ void definir_limites(nivel_caminos_t* nivel_caminos){
 /*
 *
 */
+void escribir_coordenadas_en_archivo(FILE* archivo, coordenada_t camino[MAX_LONGITUD_CAMINO], int tope_camino){
+    for(int i = 0; i < tope_camino; i++){
+        fprintf(archivo, "%d;%d\n", camino[i].fil, camino[i].col);
+    }
+}
+
+/*
+*
+*/
+void escribir_configuracion_en_archivo(char ruta[MAX_RUTA], configuracion_t configuracion){
+    FILE* archivo = fopen(ruta, "w");
+    fprintf(archivo, "%s=%d,%d\n", CLAVE_RESISTENCIA_TORRES, configuracion.resistencia_torre_1, configuracion.resistencia_torre_2);
+    fprintf(archivo, "%s=%d,%d,%d,%d\n", CLAVE_ENANOS_INICIO, configuracion.enanos_nivel_1, configuracion.enanos_nivel_2, configuracion.enanos_nivel_3, configuracion.enanos_nivel_4);
+    fprintf(archivo, "%s=%d,%d,%d,%d\n", CLAVE_ELFOS_INICIO, configuracion.elfos_nivel_1, configuracion.elfos_nivel_2, configuracion.elfos_nivel_3, configuracion.elfos_nivel_4);
+    fprintf(archivo, "%s=%d, %d, %d\n", CLAVE_ENANOS_EXTRA, configuracion.enanos_extra, configuracion.enanos_coste_torre_1, configuracion.enanos_coste_torre_2);
+    fprintf(archivo, "%s=%d, %d, %d\n", CLAVE_ELFOS_EXTRA, configuracion.elfos_extra, configuracion.elfos_coste_torre_1, configuracion.elfos_coste_torre_2);
+    fprintf(archivo, "%s=%d, %d\n", CLAVE_ENANOS_ANIMO, configuracion.enanos_fallo, configuracion.enanos_critico);
+    fprintf(archivo, "%s=%d, %d\n", CLAVE_ELFOS_ANIMO, configuracion.elfos_fallo, configuracion.elfos_critico);
+    fprintf(archivo, "%s=%f\n", CLAVE_VELOCIDAD, configuracion.velocidad_juego);
+    fprintf(archivo, "%s=%s\n", CLAVE_CAMINOS, configuracion.caminos);
+    fclose(archivo);
+}
+
+/*
+*
+*/
+void escribir_caminos_en_archivo(FILE* archivo, nivel_caminos_t nivel_caminos){
+    switch(nivel_caminos.numero_nivel){
+        case 1:
+            fprintf(archivo, "NIVEL=1\nCAMINO=1\n");
+            escribir_coordenadas_en_archivo(archivo, nivel_caminos.camino_1, nivel_caminos.tope_camino_1);
+            break;
+        case 2:
+            fprintf(archivo, "NIVEL=2\nCAMINO=1\n");
+            escribir_coordenadas_en_archivo(archivo, nivel_caminos.camino_2, nivel_caminos.tope_camino_2);
+            break;
+        case 3:
+            fprintf(archivo, "NIVEL=3\nCAMINO=1\n");
+            escribir_coordenadas_en_archivo(archivo, nivel_caminos.camino_1, nivel_caminos.tope_camino_1);
+            fprintf(archivo, "CAMINO=2\n");
+            escribir_coordenadas_en_archivo(archivo, nivel_caminos.camino_2, nivel_caminos.tope_camino_2);
+            break;
+        case 4:
+            fprintf(archivo, "NIVEL=4\nCAMINO=1\n");
+            escribir_coordenadas_en_archivo(archivo, nivel_caminos.camino_1, nivel_caminos.tope_camino_1);
+            fprintf(archivo, "CAMINO=2\n");
+            escribir_coordenadas_en_archivo(archivo, nivel_caminos.camino_2, nivel_caminos.tope_camino_2);
+            break;
+        default:
+            break;
+    }
+}
+
+
 void crear_camino(char* nombre_archivo){
     nivel_caminos_t nivel_caminos;
     nivel_caminos.numero_nivel = 1;
     definir_limites(&nivel_caminos);
     nivel_caminos.tope_camino_1 = 0;
     nivel_caminos.tope_camino_2 = 0;
+    FILE* archivo = fopen(nombre_archivo, "w");
     while(nivel_caminos.numero_nivel < 5){
         if(nivel_caminos.numero_nivel != 2){
             while (!pedir_camino(&nivel_caminos, 1)){
@@ -423,9 +531,244 @@ void crear_camino(char* nombre_archivo){
             }
         }
         //DESPUES DE ACA SE BORRA EL CAMINO, HABRIA QUE ESCRIBIRLO
+        escribir_caminos_en_archivo(archivo, nivel_caminos);
         (nivel_caminos.numero_nivel)++;
         nivel_caminos.tope_camino_1 = 0;
         nivel_caminos.tope_camino_2 = 0;
         definir_limites(&nivel_caminos);
     }
+    fclose(archivo);
+    printf("Caminos guardados en '%s'!", nombre_archivo);
+}
+
+/*
+*
+*/
+bool resistencia_torre_valida(int resistencia){
+    return (((resistencia >= RESISTENCIA_TORRE_MINIMA) && (resistencia <= RESISTENCIA_TORRE_MAXIMA)) || (resistencia == POR_DEFECTO));
+}
+
+/*
+*
+*/
+bool cantidad_defensores_valida(int defensores){
+    return (((defensores >= DEFENSORES_MINIMOS) && (defensores <= DEFENSORES_MAXIMOS)) || (defensores == POR_DEFECTO));
+}
+
+/*
+*
+*/
+bool cantidad_extra_valida(int extra){
+    return (((extra >= EXTRAS_MINIMOS) && (extra <= EXTRAS_MAXIMOS)) || (extra == POR_DEFECTO));
+}
+
+/*
+*
+*/
+bool coste_extra_valido(int extra){
+    return (((extra >= COSTE_EXTRAS_MINIMO) && (extra <= COSTE_EXTRAS_MAXIMO)) || (extra == POR_DEFECTO));
+}
+
+/*
+*
+*/
+bool porcentaje_valido(int porcentaje){
+    return (((porcentaje >= PORCENTAJE_MINIMO) && (porcentaje <= PORCENTAJE_MAXIMO)) || (porcentaje == POR_DEFECTO));
+}
+
+/*
+*
+*/
+bool velocidad_valida(float velocidad){
+    return (((velocidad >= VELOCIDAD_MINIMA) && (velocidad <= VELOCIDAD_MAXIMA)) || (velocidad == POR_DEFECTO));
+}
+
+/*
+*
+*/
+bool ruta_caminos_valida(char ruta[MAX_RUTA]){
+    if(strcmp(ruta, "-1") == 0){
+        return true;
+    }
+    if(strlen(ruta) <= 4 || strlen(ruta) >= MAX_RUTA){
+        return false;
+    }
+    FILE* archivo = fopen(ruta, "r");
+    if(archivo){
+        fclose(archivo);
+        return true;
+    }
+    return false;
+}
+
+
+void crear_configuracion(char* nombre_archivo){
+    configuracion_t configuracion;
+    printf("Se le preguntara sobre cada dato del juego. Si no desea modificar alguno de ellos ingrese '%d'.\n", POR_DEFECTO);
+    printf("Resistencia torre 1: ");
+    scanf("%d", &(configuracion.resistencia_torre_1));
+    while(!resistencia_torre_valida(configuracion.resistencia_torre_1)){
+        printf("Debe ingresar un número entre 50 y 10000 inclusive ambos: ");
+        scanf("%d", &(configuracion.resistencia_torre_1));
+    }
+
+    printf("Resistencia torre 2: ");
+    scanf("%d", &(configuracion.resistencia_torre_2));
+    while(!resistencia_torre_valida(configuracion.resistencia_torre_2)){
+        printf("Debe ingresar un número entre 50 y 10000 inclusive ambos: ");
+        scanf("%d", &(configuracion.resistencia_torre_2));
+    }
+
+    printf("Enanos nivel 1: ");
+    scanf("%d", &(configuracion.enanos_nivel_1));
+    while(!cantidad_defensores_valida(configuracion.enanos_nivel_1)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_nivel_1));
+    }
+
+    printf("Enanos nivel 2: ");
+    scanf("%d", &(configuracion.enanos_nivel_2));
+    while(!cantidad_defensores_valida(configuracion.enanos_nivel_2)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_nivel_2));
+    }
+
+    printf("Enanos nivel 3: ");
+    scanf("%d", &(configuracion.enanos_nivel_3));
+    while(!cantidad_defensores_valida(configuracion.enanos_nivel_3)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_nivel_3));
+    }
+
+    printf("Enanos nivel 4: ");
+    scanf("%d", &(configuracion.enanos_nivel_4));
+    while(!cantidad_defensores_valida(configuracion.enanos_nivel_4)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_nivel_4));
+    }
+
+    printf("Elfos nivel 1: ");
+    scanf("%d", &(configuracion.elfos_nivel_1));
+    while(!cantidad_defensores_valida(configuracion.elfos_nivel_1)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_nivel_1));
+    }
+
+    printf("Elfos nivel 2: ");
+    scanf("%d", &(configuracion.elfos_nivel_2));
+    while(!cantidad_defensores_valida(configuracion.elfos_nivel_2)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_nivel_2));
+    }
+
+    printf("Elfos nivel 3: ");
+    scanf("%d", &(configuracion.elfos_nivel_3));
+    while(!cantidad_defensores_valida(configuracion.elfos_nivel_3)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_nivel_3));
+    }
+
+    printf("Elfos nivel 4: ");
+    scanf("%d", &(configuracion.elfos_nivel_4));
+    while(!cantidad_defensores_valida(configuracion.elfos_nivel_4)){
+        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_nivel_4));
+    }
+
+    printf("Enanos extra: ");
+    scanf("%d", &(configuracion.enanos_extra));
+    while(!cantidad_extra_valida(configuracion.enanos_extra)){
+        printf("Debe ingresar un número entre 0 y 20 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_extra));
+    }
+
+    printf("Coste de enanos extra en torre 1: ");
+    scanf("%d", &(configuracion.enanos_coste_torre_1));
+    while(!coste_extra_valido(configuracion.enanos_coste_torre_1)){
+        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_coste_torre_1));
+    }
+
+    printf("Coste de enanos extra en torre 2: ");
+    scanf("%d", &(configuracion.enanos_coste_torre_2));
+    while(!coste_extra_valido(configuracion.enanos_coste_torre_2)){
+        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_coste_torre_2));
+    }
+
+    printf("Elfos extra: ");
+    scanf("%d", &(configuracion.elfos_extra));
+    while(!cantidad_extra_valida(configuracion.elfos_extra)){
+        printf("Debe ingresar un número entre 0 y 20 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_extra));
+    }
+
+    printf("Coste de elfos extra en torre 1: ");
+    scanf("%d", &(configuracion.elfos_coste_torre_1));
+    while(!coste_extra_valido(configuracion.elfos_coste_torre_1)){
+        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_coste_torre_1));
+    }
+
+    printf("Coste de elfos extra en torre 2: ");
+    scanf("%d", &(configuracion.elfos_coste_torre_2));
+    while(!coste_extra_valido(configuracion.elfos_coste_torre_2)){
+        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        scanf("%d", &(configuracion.elfos_coste_torre_2));
+    }
+
+    printf("Fallo enanos: ");
+    scanf("%d", &(configuracion.enanos_fallo));
+    while(!porcentaje_valido(configuracion.enanos_fallo)){
+        printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+        scanf("%d", &(configuracion.enanos_fallo));
+    }
+
+    if(configuracion.enanos_fallo != POR_DEFECTO){
+        printf("Las siguientes 3 preguntas no se podra ingresar el valor '%d'\n", POR_DEFECTO);
+
+        printf("Critico enanos: ");
+        scanf("%d", &(configuracion.enanos_critico));
+        while(!porcentaje_valido(configuracion.enanos_critico) || configuracion.enanos_critico == POR_DEFECTO){
+            printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+            scanf("%d", &(configuracion.enanos_critico));
+        }
+
+        printf("Fallo elfos: ");
+        scanf("%d", &(configuracion.elfos_fallo));
+        while(!porcentaje_valido(configuracion.elfos_fallo) || configuracion.elfos_fallo == POR_DEFECTO){
+            printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+            scanf("%d", &(configuracion.elfos_fallo));
+        }
+
+        printf("Critico elfos: ");
+        scanf("%d", &(configuracion.elfos_critico));
+        while(!porcentaje_valido(configuracion.elfos_critico) || configuracion.elfos_critico == POR_DEFECTO){
+            printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+            scanf("%d", &(configuracion.elfos_critico));
+        }
+    }else{
+        configuracion.enanos_critico = POR_DEFECTO;
+        configuracion.elfos_fallo = POR_DEFECTO;
+        configuracion.elfos_critico = POR_DEFECTO;
+    }
+
+    printf("Velocidad juego: ");
+    scanf("%f", &(configuracion.velocidad_juego));
+    while(!velocidad_valida(configuracion.velocidad_juego)){
+        printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+        scanf("%f", &(configuracion.velocidad_juego));
+    }
+
+    printf("Caminos juego (ruta del archivo .txt): ");
+    scanf("%s", configuracion.caminos);
+    while(!ruta_caminos_valida(configuracion.caminos)){
+        printf("Debe ingresar la ruta de un archivo EXISTENTE de caminos (de extencion .txt): ");
+        scanf("%s", configuracion.caminos);
+    }
+    
+    escribir_configuracion_en_archivo(nombre_archivo, configuracion);
+
+    printf("Configuracion guardada en '%s'!\n", nombre_archivo);
+    
 }
