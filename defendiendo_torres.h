@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define VIDA_INICIAL_TORRE 600
+#define ENANOS_EXTRA 10
+#define ELFOS_EXTRA 10
+
+
 #define MAX_FILAS 30
 #define MAX_COLUMNAS 30
 #define MAX_LONGITUD_CAMINO 200
@@ -65,7 +70,7 @@ typedef struct juego {
  * los ataques críticos y fallo de Legolas y Gimli.
  * NO inicializará el primer nivel.
  */
-void inicializar_juego(juego_t* juego, int viento, int humedad, char animo_legolas, char animo_gimli);
+void inicializar_juego(juego_t* juego, int viento, int humedad, char animo_legolas, char animo_gimli, configuracion_t configuracion);
 
 /*
  * Recibe un juego con todas sus estructuras válidas. 

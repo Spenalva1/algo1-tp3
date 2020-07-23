@@ -1,6 +1,7 @@
 #include "comandos.h"
 #include "defendiendo_torres.h"
 #include "utiles.h"
+#include "juego.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -43,7 +44,6 @@
 #define POR_DEFECTO -1
 #define VELOCIDAD_MINIMA 0.5
 #define VELOCIDAD_MAXIMA 5.0
-#define MAX_RUTA 30
 #define CLAVE_RESISTENCIA_TORRES "RESISTENCIA_TORRES"
 #define CLAVE_ENANOS_INICIO "ENANOS_INICIO"
 #define CLAVE_ELFOS_INICIO "ELFOS_INICIO"
@@ -66,32 +66,6 @@ typedef struct nivel_caminos {
     int tope_filas;
     int tope_columnas;
 } nivel_caminos_t;
-
-typedef struct configuracion{
-    int resistencia_torre_1;
-    int resistencia_torre_2;
-    int enanos_nivel_1;
-    int enanos_nivel_2;
-    int enanos_nivel_3;
-    int enanos_nivel_4;
-    int elfos_nivel_1;
-    int elfos_nivel_2;
-    int elfos_nivel_3;
-    int elfos_nivel_4;
-    int enanos_extra;
-    int enanos_coste_torre_1;
-    int enanos_coste_torre_2;
-    int elfos_extra;
-    int elfos_coste_torre_1;
-    int elfos_coste_torre_2;
-    int enanos_fallo;
-    int enanos_critico;
-    int elfos_fallo;
-    int elfos_critico;
-    float velocidad_juego;
-    char caminos[MAX_RUTA];
-    char repeticion[MAX_RUTA];
-} configuracion_t;
 
 
 /* 

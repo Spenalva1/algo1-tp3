@@ -1,9 +1,8 @@
+#include "comandos.h"
 #include "defendiendo_torres.h"
 #include <stdbool.h>
 
-#define VIDA_INICIAL_TORRE 600
-#define ENANOS_EXTRA 10
-#define ELFOS_EXTRA 10
+
 #define DIVISOR_VIENTO 2
 #define DIVISOR_HUMEDAD 2
 #define ANIMO_BUENO 'B'
@@ -43,30 +42,51 @@
 #define ELFOS_ATAQUE_LETAL 70
 #define ORCOS_VIDA 200
 #define ORCOS_MAX_EXTRA 99
+#define YA_ASIGNADO -1
+#define YA_ASIGNADO_CHAR 'Y'
 
 
 
-void inicializar_juego(juego_t* juego, int viento, int humedad, char animo_legolas, char animo_gimli){
-	juego->torres.resistencia_torre_1 = VIDA_INICIAL_TORRE;
-	juego->torres.resistencia_torre_2 = VIDA_INICIAL_TORRE;
-	juego->torres.enanos_extra = ENANOS_EXTRA;
-	juego->torres.elfos_extra = ELFOS_EXTRA;
-	juego->fallo_legolas = viento / DIVISOR_VIENTO;
-	juego->fallo_gimli = humedad / DIVISOR_HUMEDAD;
-	if(animo_gimli == ANIMO_BUENO)
-		juego->critico_gimli = CRITICO_GIMLI_BUENO;
-	else if(animo_gimli == ANIMO_REGULAR)
-		juego->critico_gimli = CRITICO_GIMLI_REGULAR;
-	else
-		juego->critico_gimli = CRITICO_GIMLI_MALO;
 
+void inicializar_juego(juego_t* juego, int viento, int humedad, char animo_legolas, char animo_gimli, configuracion_t configuracion){
+	juego->torres.resistencia_torre_1 = configuracion.resistencia_torre_1;
+	juego->torres.resistencia_torre_2 = configuracion.resistencia_torre_2;
+	juego->torres.enanos_extra = configuracion.enanos_extra;
+	juego->torres.elfos_extra = configuracion.elfos_extra;
 
-	if(animo_legolas == ANIMO_BUENO)
-		juego->critico_legolas = CRITICO_LEGOLAS_BUENO;
-	else if(animo_legolas == ANIMO_REGULAR)
-		juego->critico_legolas = CRITICO_LEGOLAS_REGULAR;
-	else
-		juego->critico_legolas = CRITICO_LEGOLAS_MALO;
+	if(humedad == YA_ASIGNADO){
+		juego->fallo_gimli = configuracion.enanos_fallo;
+	}else{
+		juego->fallo_gimli = humedad / DIVISOR_HUMEDAD;
+	}
+
+	if(viento == YA_ASIGNADO){
+		juego->fallo_legolas = configuracion.elfos_fallo;
+	}else{
+		juego->fallo_legolas = viento / DIVISOR_VIENTO;
+	}
+
+	if(animo_gimli == YA_ASIGNADO_CHAR){
+		juego->critico_gimli = configuracion.enanos_critico;
+	}else{
+		if(animo_gimli == ANIMO_BUENO)
+			juego->critico_gimli = CRITICO_GIMLI_BUENO;
+		else if(animo_gimli == ANIMO_REGULAR)
+			juego->critico_gimli = CRITICO_GIMLI_REGULAR;
+		else
+			juego->critico_gimli = CRITICO_GIMLI_MALO;
+	}
+
+	if(animo_gimli == YA_ASIGNADO_CHAR){
+		juego->critico_legolas = configuracion.elfos_critico;
+	}else{
+		if(animo_legolas == ANIMO_BUENO)
+			juego->critico_legolas = CRITICO_LEGOLAS_BUENO;
+		else if(animo_legolas == ANIMO_REGULAR)
+			juego->critico_legolas = CRITICO_LEGOLAS_REGULAR;
+		else
+			juego->critico_legolas = CRITICO_LEGOLAS_MALO;
+	}
 
 	juego->nivel_actual = 1;
 }
