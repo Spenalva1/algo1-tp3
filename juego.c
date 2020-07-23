@@ -1,4 +1,3 @@
-#include "juego.h"
 #include "comandos.h"
 #include "animos.h"
 #include "defendiendo_torres.h"
@@ -65,6 +64,15 @@
 #define CLAVE_CAMINOS "CAMINOS"
 #define FORMATO_CONFIGURACION "%[^=]="
 #define MAX_CLAVE 20
+#define RANKING "ranking"
+#define CAMINO "crear_camino"
+#define CONFIGURACION "crear_configuracion"
+#define CONFIGURACION_CLAVE "config"
+#define GRABACION_CLAVE "grabacion"
+#define REPE_CLAVE "poneme_la_repe"
+#define JUGAR "jugar"
+#define MAX_RUTA 30
+#define SEPARADOR "="
 
 
 /*
@@ -178,6 +186,97 @@ void asignar_valores_por_defecto(configuracion_t* configuracion);
 */
 void cargar_caminos_desde_archivo(caminos_t* caminos, char ruta[MAX_RUTA]);
 
+/*
+*
+*/
+void jugar(char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]);
+
+int main(int argc, char *argv[]){
+    if(cantidad_parametros_valida(argc)){
+        bool comando_valido = false;
+        if(strcmp(RANKING, argv[1]) == 0){
+            printf("MOSTRAR RANKING\n");
+            comando_valido = true;
+        }else if(strcmp(CAMINO, argv[1]) == 0){
+            if(argc > 2){
+                if(es_txt_valido(argv[2])){
+                    crear_camino(argv[2]);
+                }
+            }else{
+                printf("Debe ingresar el nombre de archivo para guardar el camino.\n");
+            }
+            comando_valido = true;
+        }else if(strcmp(CONFIGURACION, argv[1]) == 0){
+            if(argc > 2){
+                if(es_txt_valido(argv[2])){
+                    crear_configuracion(argv[2]);
+                }
+            }else{
+                printf("Debe ingresar el nombre de archivo para guardar la configuración.\n");
+            }
+            comando_valido = true;
+        }else if(strcmp(REPE_CLAVE, argv[1]) == 0){
+            printf("REPE\n");
+            comando_valido = true;
+        }else if(strcmp(JUGAR, argv[1]) == 0){
+            int i = 2;
+            bool hay_que_grabar = false;
+            bool hay_configuracion = false;
+            bool hay_errores = false;
+            char ruta_grabacion[MAX_RUTA];
+            char ruta_configuracion[MAX_RUTA];
+            char* token;
+            while(i <= MAX_COMANDOS && i < argc){
+                token = strtok(argv[i], SEPARADOR);
+                if(strcmp(token, CONFIGURACION_CLAVE) == 0){
+                    token = strtok(NULL, SEPARADOR);
+					if(token != NULL){
+						if(existe_archivo(token)){
+							hay_configuracion = true;
+							strcpy(ruta_configuracion, token);
+						}else{
+							hay_errores = true;
+						}
+					}else{
+						printf("Debe ingresar el nombre de un archivo .txt para guardar la configuracion\n");
+						hay_errores = true;
+					}
+                }else if(strcmp(token, GRABACION_CLAVE) == 0){
+                    token = strtok(NULL, SEPARADOR);
+                    if(es_dat_valido(token)){
+                        hay_que_grabar = true;
+                        strcpy(ruta_grabacion, token);
+                    }else{
+                        hay_errores = true;
+                    }
+                }
+                i++;
+            }
+            if(!hay_errores){
+                if(hay_configuracion){
+                    printf("Se obtendra la config de: %s.\n", ruta_configuracion);
+                }else{
+                    strcpy(ruta_configuracion, POR_DEFECTO_STRING);
+                }
+                if(hay_que_grabar){
+                    printf("Se grabará la partida en: %s.\n", ruta_grabacion);
+                }else{
+                    strcpy(ruta_grabacion, POR_DEFECTO_STRING);
+                }
+				if(hay_configuracion || hay_que_grabar){
+	                detener_el_tiempo(3);
+				}
+                jugar(ruta_configuracion, ruta_grabacion);
+            }
+            comando_valido = true;
+        }
+        if(!comando_valido){
+            printf("No se ingresó un comando valido!\n");
+        }
+    }
+    return 0;
+}
+
 void inicializar_configuracion(configuracion_t* configuracion){
 	configuracion->resistencia_torre_1 = POR_DEFECTO;
 	configuracion->resistencia_torre_2 = POR_DEFECTO;
@@ -203,7 +302,7 @@ void asignar_valores_por_defecto(configuracion_t* configuracion){
 	if(configuracion->resistencia_torre_1 == POR_DEFECTO){
 		configuracion->resistencia_torre_1 = VIDA_INICIAL_TORRE;
 	}
-	if(configuracion->resistencia_torre_1 == POR_DEFECTO){
+	if(configuracion->resistencia_torre_2 == POR_DEFECTO){
 		configuracion->resistencia_torre_2 = VIDA_INICIAL_TORRE;
 	}
 	if(configuracion->enanos_nivel_1 == POR_DEFECTO){
@@ -293,6 +392,8 @@ void jugar(char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]){
 	inicializar_configuracion(&configuracion);
 	if(strcmp(ruta_configuracion, POR_DEFECTO_STRING) != 0){
 		cargar_configuracion_de_archivo(ruta_configuracion, &configuracion);
+	}else{
+		configuracion.enanos_fallo = POR_DEFECTO;
 	}
 	asignar_valores_por_defecto(&configuracion);
 	if(configuracion.enanos_fallo == POR_DEFECTO){

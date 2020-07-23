@@ -1,7 +1,6 @@
 #include "comandos.h"
 #include "defendiendo_torres.h"
 #include "utiles.h"
-#include "juego.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -53,6 +52,9 @@
 #define CLAVE_ELFOS_ANIMO "ELFOS_ANIMO"
 #define CLAVE_VELOCIDAD "VELOCIDAD"
 #define CLAVE_CAMINOS "CAMINOS"
+#define TXT ".txt"
+#define DAT ".dat"
+#define MIN_COMANDOS 4
 
 typedef struct nivel_caminos {
     int numero_nivel;
@@ -66,6 +68,55 @@ typedef struct nivel_caminos {
     int tope_filas;
     int tope_columnas;
 } nivel_caminos_t;
+
+bool es_txt_valido(char ruta[MAX_RUTA]){
+    if(strcmp(ruta+strlen(ruta)-4, TXT)==0){
+        if(strlen(ruta) > 4){
+            return true;
+        }else{
+            printf("Debe ingresar al menos un caracter además de la terminación '.txt'.\n");
+        }
+    }else{
+        printf("Debe ingresar un nombre de archivo terminado en '.txt'.\n");
+    }
+    return false;
+}
+
+bool es_dat_valido(char ruta[MAX_RUTA]){
+    if(strlen(ruta) > 4){
+        if(strcmp(ruta+strlen(ruta)-4, DAT)==0){
+            return true;
+        }else{
+            printf("Debe ingresar un nombre de archivo terminado en '.dat'.\n");
+        }
+    }else{
+        printf("Debe ingresar al menos un caracter además de la terminación '.dat'.\n");
+    }
+    return false;
+}
+
+bool existe_archivo(char ruta[MAX_RUTA]){
+    FILE* archivo = fopen(ruta, "r");
+    if(archivo){
+        fclose(archivo);
+        return true;
+    }
+    printf("El archivo %s no existe!\n", ruta);
+    return false;
+}
+
+bool cantidad_parametros_valida(int argc){
+    if(argc <= MAX_COMANDOS && argc > 1){
+        return true;
+    }
+    if(argc > MAX_COMANDOS){
+        printf("Demasiados parametros!\n");
+    }
+    if(argc < MIN_COMANDOS){
+        printf("No se ingresó un comando!\n");
+    }
+    return false;
+}
 
 
 /* 

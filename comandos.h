@@ -6,6 +6,7 @@
 
 #define MAX_RUTA 30
 #define MAX_LONGITUD_CAMINO 200
+#define MAX_COMANDOS 4
 
 typedef struct configuracion{
     int resistencia_torre_1;
@@ -68,5 +69,25 @@ void crear_configuracion(char* nombre_archivo);
 *
 */
 bool ruta_caminos_valida(char ruta[MAX_RUTA]);
+
+/*
+*
+*/
+bool cantidad_parametros_valida(int argc);
+
+/*
+*
+*/
+bool es_txt_valido(char ruta[MAX_RUTA]);
+
+/*
+*
+*/
+bool es_dat_valido(char ruta[MAX_RUTA]);
+
+/*
+*
+*/
+bool existe_archivo(char ruta[MAX_RUTA]);
 
 #endif
