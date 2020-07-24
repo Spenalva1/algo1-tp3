@@ -21,16 +21,8 @@
 #define ORCOS 'O'
 #define ENANOS_ATAQUE 60
 #define ENANOS_ATAQUE_LETAL 100
-#define ENANOS_NIVEL_1 5
-#define ENANOS_NIVEL_2 0
-#define ENANOS_NIVEL_3 3
-#define ENANOS_NIVEL_4 4
 #define ELFOS_ATAQUE 30
 #define ELFOS_ATAQUE_LETAL 70
-#define ELFOS_NIVEL_1 0
-#define ELFOS_NIVEL_2 5
-#define ELFOS_NIVEL_3 3
-#define ELFOS_NIVEL_4 4
 #define ORCOS_NIVEL_1 100
 #define ORCOS_NIVEL_2 200
 #define ORCOS_NIVEL_3 300
@@ -38,21 +30,16 @@
 #define JUEGO_PERDIDO -1
 #define JUEGO_JUGANDO 0
 #define NIVEL_JUGANDO 0
-#define ENANOS_COSTE_TORRE_1 50
-#define ENANOS_COSTE_TORRE_2 0
 #define FRECUENCIA_DEFENSOR_EXTRA_NIVEL1 25
 #define FRECUENCIA_DEFENSOR_EXTRA_NIVEL2 50
 #define FRECUENCIA_DEFENSOR_EXTRA_NIVEL3 50
 #define FRECUENCIA_DEFENSOR_EXTRA_NIVEL4 50
-#define ELFOS_COSTE_TORRE_1 0
-#define ELFOS_COSTE_TORRE_2 50
 #define SI 'S'
 #define NO 'N'
 #define POR_DEFECTO -1
 #define POR_DEFECTO_STRING "-1"
 #define YA_ASIGNADO_CHAR 'Y'
 #define YA_ASIGNADO -1
-#define VELOCIDAD 0.5
 #define CLAVE_RESISTENCIA_TORRES "RESISTENCIA_TORRES"
 #define CLAVE_ENANOS_INICIO "ENANOS_INICIO"
 #define CLAVE_ELFOS_INICIO "ELFOS_INICIO"
@@ -62,16 +49,15 @@
 #define CLAVE_ELFOS_ANIMO "ELFOS_ANIMO"
 #define CLAVE_VELOCIDAD "VELOCIDAD"
 #define CLAVE_CAMINOS "CAMINOS"
-#define FORMATO_CONFIGURACION "%[^=]="
-#define MAX_CLAVE 20
 #define RANKING "ranking"
 #define CAMINO "crear_camino"
 #define CONFIGURACION "crear_configuracion"
 #define CONFIGURACION_CLAVE "config"
 #define GRABACION_CLAVE "grabacion"
 #define REPE_CLAVE "poneme_la_repe"
+#define VELOCIDAD_CLAVE "velocidad"
+#define VELOCIDAD 1.0
 #define JUGAR "jugar"
-#define MAX_RUTA 30
 #define SEPARADOR "="
 
 
@@ -92,7 +78,7 @@ void defensores_iniciales(juego_t* juego, configuracion_t configuracion);
 * hasta que todos los orcos sean eliminados o una de las torres sea destruida.
 * Juego deberá estar ya iniciaizado
 */
-void jugar_nivel(juego_t* juego, int nivel_numero, caminos_t caminos, configuracion_t configuracion);
+void jugar_nivel(juego_t* juego, int nivel_numero, caminos_t caminos, configuracion_t configuracion, FILE* archivo);
 
 /*
 * Agregará la cantidad indicada por tope de defensores del tipo indicado por "tipo" en el tablero del nivel actual de juego.
@@ -137,54 +123,11 @@ void defensor_extra(juego_t* juego, configuracion_t configuracion);
 bool quiere_defensor_extra(char tipo, configuracion_t configuracion);
 
 /*
-* Devuelve TRUE si alguna coordenada de camino coincide con las coordenadas de entrada y/o torre.
-* camino deberá ser un camino válido.
-* tope_camino positivo.
-* entrada y torre coordenadas validas del tablero.
-*/
-bool camino_valido(coordenada_t camino[MAX_LONGITUD_CAMINO], int tope_camino, coordenada_t entrada, coordenada_t torre);
-
-/*
 * Imprimirá en pantalla un cartel indicandole al usuario cómo termino la partida
 * Si estado es -1 le indicará que perdió la partida.
 * Si estado es distinto de -1 le indicará que ganó la partida.
 */
-void mostrar_resultado(int estado);
-
-/*
-*
-*/
-void inicializar_caminos(caminos_t* caminos, char ruta[MAX_RUTA]);
-
-/*
-*
-*/
-void inicializar_configuracion(configuracion_t* configuracion);
-
-/*
-*
-*/
-void copiar_camino(coordenada_t destino[MAX_LONGITUD_CAMINO], int* tope_destino, coordenada_t origen[MAX_LONGITUD_CAMINO], int tope_origen);
-
-/*
-*
-*/
-void cargar_configuracion_de_archivo(char ruta[MAX_RUTA], configuracion_t* configuracion);
-
-/*
-*
-*/
-void procesar_clave(FILE* archivo, char clave[MAX_CLAVE], configuracion_t* configuracion);
-
-/*
-*
-*/
-void asignar_valores_por_defecto(configuracion_t* configuracion);
-
-/*
-*
-*/
-void cargar_caminos_desde_archivo(caminos_t* caminos, char ruta[MAX_RUTA]);
+void mostrar_resultado(int estado, int puntaje);
 
 /*
 *
@@ -216,7 +159,45 @@ int main(int argc, char *argv[]){
             }
             comando_valido = true;
         }else if(strcmp(REPE_CLAVE, argv[1]) == 0){
-            printf("REPE\n");
+			int i = 2;
+			bool hay_errores = false;
+			bool hay_grabacion = false;
+			float velocidad = VELOCIDAD;
+			char* token;
+            char ruta_grabacion[MAX_RUTA];
+			while(i <= MAX_COMANDOS && i < argc){
+				token = strtok(argv[i], SEPARADOR);
+				if(strcmp(token, GRABACION_CLAVE) == 0){
+					token = strtok(NULL, SEPARADOR);
+					hay_grabacion = true;
+					if(token != NULL){
+						if(existe_archivo(token)){
+							strcpy(ruta_grabacion, token);
+						}else{
+							hay_errores = true;
+						}
+					}else{
+						printf("Debe ingresar el archivo que contiene la grabacion\n");
+						hay_errores = true;
+					}
+				}else if(strcmp(token, VELOCIDAD_CLAVE) == 0){
+					token = strtok(NULL, SEPARADOR);
+					if(token != NULL){
+						velocidad = (float)atof(token);
+					}else{
+						printf("Debe ingresar el valor de la velocidad.\n");
+						hay_errores = true;
+					}
+				}	
+				i++;
+			}
+			if(!hay_grabacion){
+				printf("Debe ingresar el nombre del archivo de la repetición.\n");
+				hay_errores = true;
+			}
+            if(!hay_errores){
+				mostrar_repeticion(ruta_grabacion, velocidad);
+			}
             comando_valido = true;
         }else if(strcmp(JUGAR, argv[1]) == 0){
             int i = 2;
@@ -238,23 +219,28 @@ int main(int argc, char *argv[]){
 							hay_errores = true;
 						}
 					}else{
-						printf("Debe ingresar el nombre de un archivo .txt para guardar la configuracion\n");
+						printf("Debe ingresar el nombre de un archivo .txt para guardar la configuracion.\n");
 						hay_errores = true;
 					}
                 }else if(strcmp(token, GRABACION_CLAVE) == 0){
                     token = strtok(NULL, SEPARADOR);
-                    if(es_dat_valido(token)){
-                        hay_que_grabar = true;
-                        strcpy(ruta_grabacion, token);
-                    }else{
-                        hay_errores = true;
-                    }
+					if(token != NULL){
+						if(es_dat_valido(token)){
+							hay_que_grabar = true;
+							strcpy(ruta_grabacion, token);
+						}else{
+							hay_errores = true;
+						}
+					}else{
+						printf("Debe ingresar el nombre de un archivo .dat para guardar la grabación.\n");
+						hay_errores = true;
+					}
                 }
                 i++;
             }
             if(!hay_errores){
                 if(hay_configuracion){
-                    printf("Se obtendra la config de: %s.\n", ruta_configuracion);
+                    printf("Se obtendrá la config de: %s.\n", ruta_configuracion);
                 }else{
                     strcpy(ruta_configuracion, POR_DEFECTO_STRING);
                 }
@@ -264,7 +250,7 @@ int main(int argc, char *argv[]){
                     strcpy(ruta_grabacion, POR_DEFECTO_STRING);
                 }
 				if(hay_configuracion || hay_que_grabar){
-	                detener_el_tiempo(3);
+	                detener_el_tiempo(2);
 				}
                 jugar(ruta_configuracion, ruta_grabacion);
             }
@@ -277,118 +263,9 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void inicializar_configuracion(configuracion_t* configuracion){
-	configuracion->resistencia_torre_1 = POR_DEFECTO;
-	configuracion->resistencia_torre_2 = POR_DEFECTO;
-	configuracion->enanos_nivel_1 = POR_DEFECTO;
-	configuracion->enanos_nivel_2 = POR_DEFECTO;
-	configuracion->enanos_nivel_3 = POR_DEFECTO;
-	configuracion->enanos_nivel_4 = POR_DEFECTO;
-	configuracion->elfos_nivel_1 = POR_DEFECTO;
-	configuracion->elfos_nivel_2 = POR_DEFECTO;
-	configuracion->elfos_nivel_3 = POR_DEFECTO;
-	configuracion->elfos_nivel_4 = POR_DEFECTO;
-	configuracion->enanos_extra = POR_DEFECTO;
-	configuracion->enanos_coste_torre_1 = POR_DEFECTO;
-	configuracion->enanos_coste_torre_2 = POR_DEFECTO;
-	configuracion->elfos_extra = POR_DEFECTO;
-	configuracion->elfos_coste_torre_1 = POR_DEFECTO;
-	configuracion->elfos_coste_torre_2 = POR_DEFECTO;
-	configuracion->velocidad_juego = POR_DEFECTO;
-	strcpy(configuracion->caminos, POR_DEFECTO_STRING);
-}
-
-void asignar_valores_por_defecto(configuracion_t* configuracion){
-	if(configuracion->resistencia_torre_1 == POR_DEFECTO){
-		configuracion->resistencia_torre_1 = VIDA_INICIAL_TORRE;
-	}
-	if(configuracion->resistencia_torre_2 == POR_DEFECTO){
-		configuracion->resistencia_torre_2 = VIDA_INICIAL_TORRE;
-	}
-	if(configuracion->enanos_nivel_1 == POR_DEFECTO){
-		configuracion->enanos_nivel_1 = ENANOS_NIVEL_1;
-	}
-	if(configuracion->enanos_nivel_2 == POR_DEFECTO){
-		configuracion->enanos_nivel_2 = ENANOS_NIVEL_2;
-	}
-	if(configuracion->enanos_nivel_3 == POR_DEFECTO){
-		configuracion->enanos_nivel_3 = ENANOS_NIVEL_3;
-	}
-	if(configuracion->enanos_nivel_4 == POR_DEFECTO){
-		configuracion->enanos_nivel_4 = ENANOS_NIVEL_4;
-	}
-	if(configuracion->elfos_nivel_1 == POR_DEFECTO){
-		configuracion->elfos_nivel_1 = ELFOS_NIVEL_1;
-	}
-	if(configuracion->elfos_nivel_2 == POR_DEFECTO){
-		configuracion->elfos_nivel_2 = ELFOS_NIVEL_2;
-	}
-	if(configuracion->elfos_nivel_3 == POR_DEFECTO){
-		configuracion->elfos_nivel_3 = ELFOS_NIVEL_3;
-	}
-	if(configuracion->elfos_nivel_4 == POR_DEFECTO){
-		configuracion->elfos_nivel_4 = ELFOS_NIVEL_4;
-	}
-	if(configuracion->enanos_extra == POR_DEFECTO){
-		configuracion->enanos_extra = ENANOS_EXTRA;
-	}
-	if(configuracion->enanos_coste_torre_1 == POR_DEFECTO){
-		configuracion->enanos_coste_torre_1 = ENANOS_COSTE_TORRE_1;
-	}
-	if(configuracion->enanos_coste_torre_2 == POR_DEFECTO){
-		configuracion->enanos_coste_torre_2 = ENANOS_COSTE_TORRE_2;
-	}
-	if(configuracion->elfos_extra == POR_DEFECTO){
-		configuracion->elfos_extra = ELFOS_EXTRA;
-	}
-	if(configuracion->elfos_coste_torre_1 == POR_DEFECTO){
-		configuracion->elfos_coste_torre_1 = ELFOS_COSTE_TORRE_1;
-	}
-	if(configuracion->elfos_coste_torre_2 == POR_DEFECTO){
-		configuracion->elfos_coste_torre_2 = ELFOS_COSTE_TORRE_2;
-	}
-	if(configuracion->velocidad_juego == POR_DEFECTO){
-		configuracion->velocidad_juego = VELOCIDAD;
-	}
-}
-
-void procesar_clave(FILE* archivo, char clave[MAX_CLAVE], configuracion_t* configuracion){
-	if(strcmp(CLAVE_RESISTENCIA_TORRES, clave) == 0){
-		fscanf(archivo, "%d,%d\n", &(configuracion->resistencia_torre_1), &(configuracion->resistencia_torre_2));	
-	}else if(strcmp(CLAVE_ENANOS_INICIO, clave) == 0){
-		fscanf(archivo, "%d,%d,%d,%d\n", &(configuracion->enanos_nivel_1), &(configuracion->enanos_nivel_2), &(configuracion->enanos_nivel_3), &(configuracion->enanos_nivel_4));
-	}else if(strcmp(CLAVE_ELFOS_INICIO, clave) == 0){
-		fscanf(archivo, "%d,%d,%d,%d\n", &(configuracion->elfos_nivel_1), &(configuracion->elfos_nivel_2), &(configuracion->elfos_nivel_3), &(configuracion->elfos_nivel_4));
-	}else if(strcmp(CLAVE_ENANOS_EXTRA, clave) == 0){
-		fscanf(archivo, "%d,%d,%d\n", &(configuracion->enanos_extra), &(configuracion->enanos_coste_torre_1), &(configuracion->enanos_coste_torre_2));
-	}else if(strcmp(CLAVE_ELFOS_EXTRA, clave) == 0){
-		fscanf(archivo, "%d,%d,%d\n", &(configuracion->elfos_extra), &(configuracion->elfos_coste_torre_1), &(configuracion->elfos_coste_torre_2));
-	}else if(strcmp(CLAVE_ENANOS_ANIMO, clave) == 0){
-		fscanf(archivo, "%d,%d\n", &(configuracion->enanos_fallo), &(configuracion->enanos_critico));
-	}else if(strcmp(CLAVE_ELFOS_ANIMO, clave) == 0){
-		fscanf(archivo, "%d,%d\n", &(configuracion->elfos_fallo), &(configuracion->elfos_critico));
-	}else if(strcmp(CLAVE_VELOCIDAD, clave) == 0){
-		fscanf(archivo, "%f\n", &(configuracion->velocidad_juego));
-	}else if(strcmp(CLAVE_CAMINOS, clave) == 0){
-		fscanf(archivo, "%s\n", configuracion->caminos);
-	}
-}
-
-void cargar_configuracion_de_archivo(char ruta[MAX_RUTA], configuracion_t* configuracion){
-	FILE* archivo = fopen(ruta, "r");
-	char clave[MAX_CLAVE];
-	int leidos = fscanf(archivo, FORMATO_CONFIGURACION, clave);
-	while(leidos == 1){
-		procesar_clave(archivo, clave, configuracion);
-		leidos = fscanf(archivo, FORMATO_CONFIGURACION, clave);
-	}
-	fclose(archivo);
-}
-
 void jugar(char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]){
 	configuracion_t configuracion;
     juego_t juego;
-
 	inicializar_configuracion(&configuracion);
 	if(strcmp(ruta_configuracion, POR_DEFECTO_STRING) != 0){
 		cargar_configuracion_de_archivo(ruta_configuracion, &configuracion);
@@ -410,22 +287,36 @@ void jugar(char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]){
 
 	srand ((unsigned)time(NULL));
 
+	FILE* archivo;
+	if(strcmp(ruta_grabacion, POR_DEFECTO_STRING) != 0){
+		archivo = fopen(ruta_grabacion, "w");
+	}
+
+	int orcos_muertos[4];
     int i = 0;
     while(estado_juego(juego) == JUEGO_JUGANDO){
         i++;
-        jugar_nivel(&juego, i, caminos, configuracion);
+        jugar_nivel(&juego, i, caminos, configuracion, archivo);
+		orcos_muertos[i-1] = orcos_muertos_en_nivel(juego.nivel);
     }
 
-    mostrar_resultado(estado_juego(juego));
+	int puntaje = calcular_puntaje(juego.nivel_actual, configuracion, orcos_muertos);
+	escribir_puntaje_en_ranking(puntaje, ruta_configuracion);
+    mostrar_resultado(estado_juego(juego), puntaje);
+	
+	if(strcmp(ruta_grabacion, POR_DEFECTO_STRING) != 0){
+		fclose(archivo);
+	}
 }
 
-void mostrar_resultado(int estado){
+void mostrar_resultado(int estado, int puntaje){
     if(estado == JUEGO_PERDIDO){
         printf("*****************************************\n");
         printf("*****************************************\n");
         printf("**                                     **\n");
         printf("**            ¡HAS PERDIDO!            **\n");
         printf("**         SUERTE EN LA PROXIMA        **\n");
+        printf("**             PUNTAJE: %d             **\n", puntaje);
         printf("**                                     **\n");
         printf("*****************************************\n");
         printf("*****************************************\n");
@@ -435,6 +326,7 @@ void mostrar_resultado(int estado){
         printf("**                                     **\n");
         printf("**            ¡HAS GANADO!             **\n");
         printf("**          GRACIAS POR JUGAR          **\n");
+        printf("**             PUNTAJE: %d             **\n", puntaje);
         printf("**                                     **\n");
         printf("*****************************************\n");
         printf("*****************************************\n");
@@ -513,146 +405,6 @@ void defensores_iniciales(juego_t* juego, configuracion_t configuracion){
     }
 }
 
-void cargar_caminos_desde_archivo(caminos_t* caminos, char ruta[MAX_RUTA]){
-	FILE* archivo = fopen (ruta, "r");
-	char coordenada[MAX_RUTA];
-    char* token;
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	fscanf(archivo, "%[^\n]\n", coordenada);
-
-	caminos->tope_camino_1_nivel_1 = 0;
-	caminos->tope_camino_2_nivel_1 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	while (strcmp(coordenada, "NIVEL=2")){
-		token = strtok(coordenada, ";");
-		caminos->camino_1_nivel_1[caminos->tope_camino_1_nivel_1].fil = atoi(token);
-        token = strtok(NULL, ";");
-		caminos->camino_1_nivel_1[caminos->tope_camino_1_nivel_1].col = atoi(token);
-		(caminos->tope_camino_1_nivel_1)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
-	}
-
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	caminos->tope_camino_1_nivel_2 = 0;
-	caminos->tope_camino_2_nivel_2 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	while (strcmp(coordenada, "NIVEL=3")){
-		token = strtok(coordenada, ";");
-		caminos->camino_2_nivel_2[caminos->tope_camino_2_nivel_2].fil = atoi(token);
-        token = strtok(NULL, ";");
-		caminos->camino_2_nivel_2[caminos->tope_camino_2_nivel_2].col = atoi(token);
-		(caminos->tope_camino_2_nivel_2)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
-	}
-
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	caminos->tope_camino_1_nivel_3 = 0;
-	caminos->tope_camino_2_nivel_3 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	while (strcmp(coordenada, "CAMINO=2")){
-		token = strtok(coordenada, ";");
-		caminos->camino_1_nivel_3[caminos->tope_camino_1_nivel_3].fil = atoi(token);
-        token = strtok(NULL, ";");
-		caminos->camino_1_nivel_3[caminos->tope_camino_1_nivel_3].col = atoi(token);
-		(caminos->tope_camino_1_nivel_3)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
-	}
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	while (strcmp(coordenada, "NIVEL=4")){
-		token = strtok(coordenada, ";");
-		caminos->camino_2_nivel_3[caminos->tope_camino_2_nivel_3].fil = atoi(token);
-        token = strtok(NULL, ";");
-		caminos->camino_2_nivel_3[caminos->tope_camino_2_nivel_3].col = atoi(token);
-		(caminos->tope_camino_2_nivel_3)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
-	}
-	
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	caminos->tope_camino_1_nivel_4 = 0;
-	caminos->tope_camino_2_nivel_4 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	while (strcmp(coordenada, "CAMINO=2")){
-		token = strtok(coordenada, ";");
-		caminos->camino_1_nivel_4[caminos->tope_camino_1_nivel_4].fil = atoi(token);
-        token = strtok(NULL, ";");
-		caminos->camino_1_nivel_4[caminos->tope_camino_1_nivel_4].col = atoi(token);
-		(caminos->tope_camino_1_nivel_4)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
-	}
-	int coordenada_leida = fscanf(archivo, "%[^\n]\n", coordenada);
-	while (coordenada_leida == 1){
-		token = strtok(coordenada, ";");
-		caminos->camino_2_nivel_4[caminos->tope_camino_2_nivel_4].fil = atoi(token);
-        token = strtok(NULL, ";");
-		caminos->camino_2_nivel_4[caminos->tope_camino_2_nivel_4].col = atoi(token);
-		(caminos->tope_camino_2_nivel_4)++;
-		coordenada_leida = fscanf(archivo, "%[^\n]\n", coordenada);
-	}
-
-	fclose(archivo);
-}
-
-void inicializar_caminos(caminos_t* caminos, char ruta[MAX_RUTA]){
-	if(strcmp(ruta, POR_DEFECTO_STRING) == 0){
-
-		coordenada_t entrada;
-		coordenada_t torre;
-
-		// nivel 1
-		entrada.col = COLUMNAS_NIVEL1 - 1;
-		entrada.fil = rand() % FILAS_NIVEL1;
-		torre.col = 0;
-		torre.fil = rand() % FILAS_NIVEL1;
-		obtener_camino(caminos->camino_1_nivel_1, &(caminos->tope_camino_1_nivel_1), entrada, torre);
-		caminos->tope_camino_2_nivel_1 = 0;
-
-		//nivel 2
-		entrada.col = 0;
-		entrada.fil = rand() % FILAS_NIVEL2;
-		torre.col = COLUMNAS_NIVEL2 - 1;
-		torre.fil = rand() % FILAS_NIVEL2;
-		obtener_camino(caminos->camino_2_nivel_2, &(caminos->tope_camino_2_nivel_2), entrada, torre);
-		caminos->tope_camino_1_nivel_2 = 0;
-
-		//nivel 3
-		entrada.fil = 0;
-		entrada.col = rand() % (COLUMNAS_NIVEL3 / 2);
-		torre.fil = FILAS_NIVEL3 - 1;
-		torre.col = rand() % (COLUMNAS_NIVEL3 / 2);
-		obtener_camino(caminos->camino_1_nivel_3, &(caminos->tope_camino_1_nivel_3), entrada, torre);
-		entrada.col = (rand() % (COLUMNAS_NIVEL3 / 2)) + (COLUMNAS_NIVEL3 / 2);
-		torre.col = (rand() % (COLUMNAS_NIVEL3 / 2)) + (COLUMNAS_NIVEL3 / 2);
-		obtener_camino(caminos->camino_2_nivel_3, &(caminos->tope_camino_2_nivel_3), entrada, torre);
-        while(!camino_valido(caminos->camino_2_nivel_3, caminos->tope_camino_2_nivel_3, caminos->camino_1_nivel_3[0], caminos->camino_1_nivel_3[caminos->tope_camino_1_nivel_3 - 1])){
-			obtener_camino(caminos->camino_2_nivel_3, &(caminos->tope_camino_2_nivel_3), entrada, torre);
-		}
-
-		//nivel 4
-		entrada.fil = FILAS_NIVEL4 - 1;;
-		entrada.col = rand() % (COLUMNAS_NIVEL4 / 2);
-		torre.fil = 0;
-		torre.col = rand() % (COLUMNAS_NIVEL4 / 2);
-		obtener_camino(caminos->camino_1_nivel_4, &(caminos->tope_camino_1_nivel_4), entrada, torre);
-		entrada.col = (rand() % (COLUMNAS_NIVEL4 / 2)) + (COLUMNAS_NIVEL4 / 2);
-		torre.col = (rand() % (COLUMNAS_NIVEL4 / 2)) + (COLUMNAS_NIVEL4 / 2);
-		obtener_camino(caminos->camino_2_nivel_4, &(caminos->tope_camino_2_nivel_4), entrada, torre);
-        while(!camino_valido(caminos->camino_2_nivel_4, caminos->tope_camino_2_nivel_4, caminos->camino_1_nivel_4[0], caminos->camino_1_nivel_4[caminos->tope_camino_1_nivel_4 - 1])){
-			obtener_camino(caminos->camino_2_nivel_4, &(caminos->tope_camino_2_nivel_4), entrada, torre);
-		}
-	}else{
-		cargar_caminos_desde_archivo(caminos, ruta);
-	}
-
-}
-
-void copiar_camino(coordenada_t destino[MAX_LONGITUD_CAMINO], int* tope_destino, coordenada_t origen[MAX_LONGITUD_CAMINO], int tope_origen){
-	for(int i = 0; i < tope_origen; i++){
-		destino[i].fil = origen[i].fil;
-		destino[i].col = origen[i].col;
-	}
-	*tope_destino = tope_origen;
-}
-
 void inicializar_nivel(nivel_t* nivel, int nivel_numero, caminos_t caminos){
 	nivel->tope_enemigos = 0;
 
@@ -690,25 +442,16 @@ void inicializar_nivel(nivel_t* nivel, int nivel_numero, caminos_t caminos){
 	}
 }
 
-bool camino_valido(coordenada_t camino[MAX_LONGITUD_CAMINO], int tope_camino, coordenada_t entrada, coordenada_t torre){
-    bool camino_valido = true;
-    int i = 0;
-    while(i < tope_camino && camino_valido){
-        if((camino[i].fil == entrada.fil && camino[i].col == entrada.col) || (camino[i].fil == torre.fil && camino[i].col == torre.col))
-            camino_valido = false;
-        i++;
-    }
-    return camino_valido;
-}
-
-void jugar_nivel(juego_t* juego, int nivel_numero, caminos_t caminos, configuracion_t configuracion){
+void jugar_nivel(juego_t* juego, int nivel_numero, caminos_t caminos, configuracion_t configuracion, FILE* archivo){
     bool ultimo_extra_preguntado = false;
     juego->nivel_actual = nivel_numero;
     inicializar_nivel(&(juego->nivel), nivel_numero, caminos);
     defensores_iniciales(juego, configuracion);
 
     mostrar_juego(*juego);
-    while(estado_nivel(juego->nivel) == NIVEL_JUGANDO && estado_juego(*juego) != JUEGO_PERDIDO){ //ACA
+    while(estado_nivel(juego->nivel) == NIVEL_JUGANDO && estado_juego(*juego) != JUEGO_PERDIDO){
+		
+
         detener_el_tiempo(configuracion.velocidad_juego);
         jugar_turno(juego);
         mostrar_juego(*juego);
@@ -716,6 +459,10 @@ void jugar_nivel(juego_t* juego, int nivel_numero, caminos_t caminos, configurac
 		    defensor_extra(juego, configuracion);
         if(juego->nivel.tope_enemigos == juego->nivel.max_enemigos_nivel)
             ultimo_extra_preguntado = true;
+
+		if(archivo != NULL){
+			fwrite(juego, sizeof(juego_t), 1, archivo);
+		}
     }
 }
 
