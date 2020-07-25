@@ -54,6 +54,7 @@
 #define CONFIGURACION "crear_configuracion"
 #define CONFIGURACION_CLAVE "config"
 #define LISTAR_CLAVE "listar"
+#define LISTAR_MINIMO 1
 #define GRABACION_CLAVE "grabacion"
 #define REPE_CLAVE "poneme_la_repe"
 #define VELOCIDAD_CLAVE "velocidad"
@@ -164,6 +165,10 @@ int main(int argc, char *argv[]){
 					token = strtok(NULL, SEPARADOR);
 					if(token != NULL){
 						listar = atoi(token);
+						if(listar < LISTAR_MINIMO){
+							printf("El valor a listar debe ser mayor o igual a %d\n", LISTAR_MINIMO);
+							hay_errores = true;
+						}
 					}else{
 						printf("Debe ingresar el valor a listar.\n");
 						hay_errores = true;
@@ -172,8 +177,7 @@ int main(int argc, char *argv[]){
 				i++;
 			}
 			if(!hay_cofiguracion){
-				printf("Debe ingresar el nombre del archivo de la configuración.\n");
-				hay_errores = true;
+				strcpy(ruta_configuracion, POR_DEFECTO_STRING);
 			}
             if(!hay_errores){
 				mostrar_ranking(ruta_configuracion, listar);

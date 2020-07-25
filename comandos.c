@@ -79,6 +79,7 @@
 #define ORCOS_NIVEL_3 300
 #define MULTIPLICADOR_ORCOS_MUERTOS 1000
 #define MAX_NOMBRE 50
+#define NO_HAY_REGISTROS -1
 
 typedef struct ranking{
     char nombre[MAX_NOMBRE];
@@ -1113,7 +1114,26 @@ void construir_ruta_ranking(char config[MAX_RUTA], char ruta[MAX_RUTA]){
 void mostrar_ranking(char ruta_configuracion[MAX_RUTA], int listar){
     char ruta[MAX_RUTA];
     construir_ruta_ranking(ruta_configuracion, ruta);
-    // YA TENGO LA RUTA Y LA CANTIDAD A LISTAR. SOLO FALTA ABRIR EL ARCHIVO Y MOSTRAR
+    FILE* archivo = fopen(ruta, "r");
+    char nombre[MAX_NOMBRE];
+    int puntaje = NO_HAY_REGISTROS;
+
+    if(archivo){
+        int i = 0;
+        int leidos = fscanf(archivo, "%[^;];%d\n", nombre, &puntaje);
+        if(leidos==CAMPOS_RANKING){
+            printf("PUNTOS         NOMBRE\n");
+            while(leidos == CAMPOS_RANKING && i < listar){
+                printf("%d             %s\n", puntaje, nombre);
+                leidos = fscanf(archivo, "%[^;];%d\n", nombre, &puntaje);
+                i++;
+            }
+        }
+        fclose(archivo);
+    }
+    if(puntaje == NO_HAY_REGISTROS){
+        printf("Todavia no hay rankings para la congifuración ingresada.\n");
+    }
 }
 
 
