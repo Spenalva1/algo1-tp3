@@ -8,6 +8,7 @@
 #define MAX_LONGITUD_CAMINO 200
 #define MAX_COMANDOS 4
 #define MAX_CLAVE 20
+#define LISTAR_TODOS -1
 
 typedef struct configuracion{
     int resistencia_torre_1;
@@ -75,6 +76,11 @@ int orcos_muertos_en_nivel(nivel_t nivel);
 *
 */
 void mostrar_repeticion(char ruta_grabacion[MAX_RUTA], float velocidad);
+
+/*
+*
+*/
+void mostrar_ranking(char ruta_configuracion[MAX_RUTA], int listar);
 
 /*
 *

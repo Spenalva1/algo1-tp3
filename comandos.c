@@ -42,7 +42,7 @@
 #define PORCENTAJE_MAXIMO 99
 #define POR_DEFECTO -1
 #define POR_DEFECTO_STRING "-1"
-#define VELOCIDAD_MINIMA 0.5
+#define VELOCIDAD_MINIMA 0.25
 #define VELOCIDAD_MAXIMA 5.0
 #define CLAVE_RESISTENCIA_TORRES "RESISTENCIA_TORRES"
 #define CLAVE_ENANOS_INICIO "ENANOS_INICIO"
@@ -922,119 +922,119 @@ void crear_configuracion(char* nombre_archivo){
     printf("Resistencia torre 1: ");
     scanf("%d", &(configuracion.resistencia_torre_1));
     while(!resistencia_torre_valida(configuracion.resistencia_torre_1)){
-        printf("Debe ingresar un número entre 50 y 10000 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", RESISTENCIA_TORRE_MINIMA, RESISTENCIA_TORRE_MINIMA);
         scanf("%d", &(configuracion.resistencia_torre_1));
     }
 
     printf("Resistencia torre 2: ");
     scanf("%d", &(configuracion.resistencia_torre_2));
     while(!resistencia_torre_valida(configuracion.resistencia_torre_2)){
-        printf("Debe ingresar un número entre 50 y 10000 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", RESISTENCIA_TORRE_MINIMA, RESISTENCIA_TORRE_MINIMA);
         scanf("%d", &(configuracion.resistencia_torre_2));
     }
 
     printf("Enanos nivel 1: ");
     scanf("%d", &(configuracion.enanos_nivel_1));
     while(!cantidad_defensores_valida(configuracion.enanos_nivel_1)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.enanos_nivel_1));
     }
 
     printf("Enanos nivel 2: ");
     scanf("%d", &(configuracion.enanos_nivel_2));
     while(!cantidad_defensores_valida(configuracion.enanos_nivel_2)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.enanos_nivel_2));
     }
 
     printf("Enanos nivel 3: ");
     scanf("%d", &(configuracion.enanos_nivel_3));
     while(!cantidad_defensores_valida(configuracion.enanos_nivel_3)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.enanos_nivel_3));
     }
 
     printf("Enanos nivel 4: ");
     scanf("%d", &(configuracion.enanos_nivel_4));
     while(!cantidad_defensores_valida(configuracion.enanos_nivel_4)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.enanos_nivel_4));
     }
 
     printf("Elfos nivel 1: ");
     scanf("%d", &(configuracion.elfos_nivel_1));
     while(!cantidad_defensores_valida(configuracion.elfos_nivel_1)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.elfos_nivel_1));
     }
 
     printf("Elfos nivel 2: ");
     scanf("%d", &(configuracion.elfos_nivel_2));
     while(!cantidad_defensores_valida(configuracion.elfos_nivel_2)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.elfos_nivel_2));
     }
 
     printf("Elfos nivel 3: ");
     scanf("%d", &(configuracion.elfos_nivel_3));
     while(!cantidad_defensores_valida(configuracion.elfos_nivel_3)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.elfos_nivel_3));
     }
 
     printf("Elfos nivel 4: ");
     scanf("%d", &(configuracion.elfos_nivel_4));
     while(!cantidad_defensores_valida(configuracion.elfos_nivel_4)){
-        printf("Debe ingresar un número entre 2 y 15 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", DEFENSORES_MINIMOS, DEFENSORES_MAXIMOS);
         scanf("%d", &(configuracion.elfos_nivel_4));
     }
 
     printf("Enanos extra: ");
     scanf("%d", &(configuracion.enanos_extra));
     while(!cantidad_extra_valida(configuracion.enanos_extra)){
-        printf("Debe ingresar un número entre 0 y 20 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", EXTRAS_MINIMOS, EXTRAS_MAXIMOS);
         scanf("%d", &(configuracion.enanos_extra));
     }
 
     printf("Coste de enanos extra en torre 1: ");
     scanf("%d", &(configuracion.enanos_coste_torre_1));
     while(!coste_extra_valido(configuracion.enanos_coste_torre_1)){
-        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", COSTE_EXTRAS_MINIMO, COSTE_EXTRAS_MAXIMO);
         scanf("%d", &(configuracion.enanos_coste_torre_1));
     }
 
     printf("Coste de enanos extra en torre 2: ");
     scanf("%d", &(configuracion.enanos_coste_torre_2));
     while(!coste_extra_valido(configuracion.enanos_coste_torre_2)){
-        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", COSTE_EXTRAS_MINIMO, COSTE_EXTRAS_MAXIMO);
         scanf("%d", &(configuracion.enanos_coste_torre_2));
     }
 
     printf("Elfos extra: ");
     scanf("%d", &(configuracion.elfos_extra));
     while(!cantidad_extra_valida(configuracion.elfos_extra)){
-        printf("Debe ingresar un número entre 0 y 20 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", EXTRAS_MINIMOS, EXTRAS_MAXIMOS);
         scanf("%d", &(configuracion.elfos_extra));
     }
 
     printf("Coste de elfos extra en torre 1: ");
     scanf("%d", &(configuracion.elfos_coste_torre_1));
     while(!coste_extra_valido(configuracion.elfos_coste_torre_1)){
-        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", COSTE_EXTRAS_MINIMO, COSTE_EXTRAS_MAXIMO);
         scanf("%d", &(configuracion.elfos_coste_torre_1));
     }
 
     printf("Coste de elfos extra en torre 2: ");
     scanf("%d", &(configuracion.elfos_coste_torre_2));
     while(!coste_extra_valido(configuracion.elfos_coste_torre_2)){
-        printf("Debe ingresar un número entre 0 y 150 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", COSTE_EXTRAS_MINIMO, COSTE_EXTRAS_MAXIMO);
         scanf("%d", &(configuracion.elfos_coste_torre_2));
     }
 
     printf("Fallo enanos: ");
     scanf("%d", &(configuracion.enanos_fallo));
     while(!porcentaje_valido(configuracion.enanos_fallo)){
-        printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", PORCENTAJE_MINIMO, PORCENTAJE_MAXIMO);
         scanf("%d", &(configuracion.enanos_fallo));
     }
 
@@ -1044,21 +1044,21 @@ void crear_configuracion(char* nombre_archivo){
         printf("Critico enanos: ");
         scanf("%d", &(configuracion.enanos_critico));
         while(!porcentaje_valido(configuracion.enanos_critico) || configuracion.enanos_critico == POR_DEFECTO){
-            printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+            printf("Debe ingresar un número entre %d y %d inclusive ambos: ", PORCENTAJE_MINIMO, PORCENTAJE_MAXIMO);
             scanf("%d", &(configuracion.enanos_critico));
         }
 
         printf("Fallo elfos: ");
         scanf("%d", &(configuracion.elfos_fallo));
         while(!porcentaje_valido(configuracion.elfos_fallo) || configuracion.elfos_fallo == POR_DEFECTO){
-            printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+            printf("Debe ingresar un número entre %d y %d inclusive ambos: ", PORCENTAJE_MINIMO, PORCENTAJE_MAXIMO);
             scanf("%d", &(configuracion.elfos_fallo));
         }
 
         printf("Critico elfos: ");
         scanf("%d", &(configuracion.elfos_critico));
         while(!porcentaje_valido(configuracion.elfos_critico) || configuracion.elfos_critico == POR_DEFECTO){
-            printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+            printf("Debe ingresar un número entre %d y %d inclusive ambos: ", PORCENTAJE_MINIMO, PORCENTAJE_MAXIMO);
             scanf("%d", &(configuracion.elfos_critico));
         }
     }else{
@@ -1070,7 +1070,7 @@ void crear_configuracion(char* nombre_archivo){
     printf("Velocidad juego: ");
     scanf("%f", &(configuracion.velocidad_juego));
     while(!velocidad_valida(configuracion.velocidad_juego)){
-        printf("Debe ingresar un número entre 1 y 99 inclusive ambos: ");
+        printf("Debe ingresar un número entre %f y %f inclusive ambos: ", VELOCIDAD_MINIMA, VELOCIDAD_MAXIMA);
         scanf("%f", &(configuracion.velocidad_juego));
     }
 
@@ -1109,6 +1109,13 @@ void construir_ruta_ranking(char config[MAX_RUTA], char ruta[MAX_RUTA]){
     }
     strcat(ruta, CSV);
 }
+
+void mostrar_ranking(char ruta_configuracion[MAX_RUTA], int listar){
+    char ruta[MAX_RUTA];
+    construir_ruta_ranking(ruta_configuracion, ruta);
+    // YA TENGO LA RUTA Y LA CANTIDAD A LISTAR. SOLO FALTA ABRIR EL ARCHIVO Y MOSTRAR
+}
+
 
 void preguntar_nombre(char nombre[MAX_NOMBRE]){
     printf("Ingrese su nombre para guardar en el ranking: ");
