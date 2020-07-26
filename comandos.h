@@ -60,7 +60,7 @@ typedef struct caminos{
 /*
 *
 */
-void comando_jugar(int argc, char* argv[]);
+bool comando_jugar(int argc, char* argv[], char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]);
 
 /*
 *

@@ -1316,13 +1316,11 @@ void comando_poneme_la_repe(int argc, char* argv[]){
     }
 }
 
-void comando_jugar(int argc, char* argv[]){
+bool comando_jugar(int argc, char* argv[], char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]){
 	int i = 2;
 	bool hay_que_grabar = false;
 	bool hay_configuracion = false;
 	bool hay_errores = false;
-	char ruta_grabacion[MAX_RUTA];
-	char ruta_configuracion[MAX_RUTA];
 	char* token;
 	while(i <= MAX_COMANDOS && i < argc){
 		token = strtok(argv[i], SEPARADOR);
@@ -1355,20 +1353,20 @@ void comando_jugar(int argc, char* argv[]){
 		}
 		i++;
 	}
-	if(!hay_errores){
-		if(hay_configuracion){
-			printf("Se obtendrá la config de: %s.\n", ruta_configuracion);
-		}else{
-			strcpy(ruta_configuracion, POR_DEFECTO_STRING);
-		}
-		if(hay_que_grabar){
-			printf("Se grabará la partida en: %s.\n", ruta_grabacion);
-		}else{
-			strcpy(ruta_grabacion, POR_DEFECTO_STRING);
-		}
-		if(hay_configuracion || hay_que_grabar){
-			detener_el_tiempo(2);
-		}
-		jugar(ruta_configuracion, ruta_grabacion);
-	}
+    if(!hay_errores){
+        if(hay_configuracion){
+            printf("Se obtendrá la config de: %s.\n", ruta_configuracion);
+        }else{
+            strcpy(ruta_configuracion, POR_DEFECTO_STRING);
+        }
+        if(hay_que_grabar){
+            printf("Se grabará la partida en: %s.\n", ruta_grabacion);
+        }else{
+            strcpy(ruta_grabacion, POR_DEFECTO_STRING);
+        }
+        if(hay_configuracion || hay_que_grabar){
+            detener_el_tiempo(2);
+        }
+    }
+    return !hay_errores;
 }

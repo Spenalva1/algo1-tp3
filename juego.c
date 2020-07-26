@@ -135,7 +135,11 @@ int main(int argc, char* argv[]){
 			comando_poneme_la_repe(argc, argv);
             comando_valido = true;
         }else if(strcmp(COMANDO_JUGAR, argv[1]) == 0){
-			comando_jugar(argc, argv);
+			char ruta_configuracion[MAX_RUTA];
+			char ruta_grabacion[MAX_RUTA];
+			if(comando_jugar(argc, argv, ruta_configuracion, ruta_grabacion)){
+    			jugar(ruta_configuracion, ruta_grabacion);
+			}
             comando_valido = true;
         }
         if(!comando_valido){
