@@ -56,11 +56,16 @@
 #define RUTA_RANKING_BASE "ranking"
 #define FORMATO_CONFIGURACION "%[^=]="
 #define CAMPOS_RANKING 2
+#define LISTAR_CLAVE "listar"
+#define LISTAR_MINIMO 1
+#define VELOCIDAD_CLAVE "velocidad"
+#define GRABACION_CLAVE "grabacion"
+#define CONFIGURACION_CLAVE "config"
 #define ARCHIVO_AUXILIAR "aux.csv"
 #define TXT ".txt"
 #define DAT ".dat"
 #define CSV ".csv"
-#define MIN_COMANDOS 4
+#define MIN_COMANDOS 2
 #define ENANOS_NIVEL_1 5
 #define ENANOS_NIVEL_2 0
 #define ENANOS_NIVEL_3 3
@@ -74,12 +79,10 @@
 #define ELFOS_COSTE_TORRE_1 0
 #define ELFOS_COSTE_TORRE_2 50
 #define VELOCIDAD 0.5
-#define ORCOS_NIVEL_1 100
-#define ORCOS_NIVEL_2 200
-#define ORCOS_NIVEL_3 300
 #define MULTIPLICADOR_ORCOS_MUERTOS 1000
 #define MAX_NOMBRE 50
 #define NO_HAY_REGISTROS -1
+#define SEPARADOR "="
 
 typedef struct ranking{
     char nombre[MAX_NOMBRE];
@@ -1123,7 +1126,7 @@ void mostrar_ranking(char ruta_configuracion[MAX_RUTA], int listar){
         int leidos = fscanf(archivo, "%[^;];%d\n", nombre, &puntaje);
         if(leidos==CAMPOS_RANKING){
             printf("PUNTOS         NOMBRE\n");
-            while(leidos == CAMPOS_RANKING && i < listar){
+            while(leidos == CAMPOS_RANKING && (i < listar || listar == LISTAR_TODOS)){
                 printf("%d             %s\n", puntaje, nombre);
                 leidos = fscanf(archivo, "%[^;];%d\n", nombre, &puntaje);
                 i++;
@@ -1204,4 +1207,168 @@ void mostrar_repeticion(char ruta[MAX_RUTA], float velocidad){
         fread(&juego, sizeof(juego_t), 1, archivo);
     }
     fclose(archivo);
+}
+
+void comando_ranking(int argc, char* argv[]){
+	int i = 2;
+	bool hay_errores = false;
+	bool hay_cofiguracion = false;
+	int listar = LISTAR_TODOS;
+	char* token;
+	char ruta_configuracion[MAX_RUTA];
+	while(i <= MAX_COMANDOS && i < argc){
+		token = strtok(argv[i], SEPARADOR);
+		if(strcmp(token, CONFIGURACION_CLAVE) == 0){
+			token = strtok(NULL, SEPARADOR);
+			hay_cofiguracion = true;
+			if(token != NULL){
+				if(existe_archivo(token)){
+					strcpy(ruta_configuracion, token);
+				}else{
+					hay_errores = true;
+				}
+			}else{
+				printf("Debe ingresar el archivo de la configuración\n");
+				hay_errores = true;
+			}
+		}else if(strcmp(token, LISTAR_CLAVE) == 0){
+			token = strtok(NULL, SEPARADOR);
+			if(token != NULL){
+				listar = atoi(token);
+				if(listar < LISTAR_MINIMO){
+					printf("El valor a listar debe ser mayor o igual a %d\n", LISTAR_MINIMO);
+					hay_errores = true;
+				}
+			}else{
+				printf("Debe ingresar el valor a listar.\n");
+				hay_errores = true;
+			}
+		}	
+		i++;
+	}
+	if(!hay_cofiguracion){
+		strcpy(ruta_configuracion, POR_DEFECTO_STRING);
+	}
+	if(!hay_errores){
+		mostrar_ranking(ruta_configuracion, listar);
+	}
+}
+
+void comando_crear_camino(int argc, char* argv[]){
+	if(argc > 2){
+		if(es_txt_valido(argv[2])){
+			crear_camino(argv[2]);
+		}
+	}else{
+		printf("Debe ingresar el nombre de archivo para guardar el camino.\n");
+	}
+}
+
+void comando_crear_configuracion(int argc, char* argv[]){
+	if(argc > 2){
+		if(es_txt_valido(argv[2])){
+			crear_configuracion(argv[2]);
+		}
+	}else{
+		printf("Debe ingresar el nombre de archivo para guardar la configuración.\n");
+	}
+}
+
+void comando_poneme_la_repe(int argc, char* argv[]){
+    int i = 2;
+    bool hay_errores = false;
+    bool hay_grabacion = false;
+    float velocidad = VELOCIDAD;
+    char* token;
+    char ruta_grabacion[MAX_RUTA];
+    while(i <= MAX_COMANDOS && i < argc){
+        token = strtok(argv[i], SEPARADOR);
+        if(strcmp(token, GRABACION_CLAVE) == 0){
+            token = strtok(NULL, SEPARADOR);
+            hay_grabacion = true;
+            if(token != NULL){
+                if(existe_archivo(token)){
+                    strcpy(ruta_grabacion, token);
+                }else{
+                    hay_errores = true;
+                }
+            }else{
+                printf("Debe ingresar el archivo que contiene la grabacion\n");
+                hay_errores = true;
+            }
+        }else if(strcmp(token, VELOCIDAD_CLAVE) == 0){
+            token = strtok(NULL, SEPARADOR);
+            if(token != NULL){
+                velocidad = (float)atof(token);
+            }else{
+                printf("Debe ingresar el valor de la velocidad.\n");
+                hay_errores = true;
+            }
+        }	
+        i++;
+    }
+    if(!hay_grabacion){
+        printf("Debe ingresar el nombre del archivo de la repetición.\n");
+        hay_errores = true;
+    }
+    if(!hay_errores){
+        mostrar_repeticion(ruta_grabacion, velocidad);
+    }
+}
+
+void comando_jugar(int argc, char* argv[]){
+	int i = 2;
+	bool hay_que_grabar = false;
+	bool hay_configuracion = false;
+	bool hay_errores = false;
+	char ruta_grabacion[MAX_RUTA];
+	char ruta_configuracion[MAX_RUTA];
+	char* token;
+	while(i <= MAX_COMANDOS && i < argc){
+		token = strtok(argv[i], SEPARADOR);
+		if(strcmp(token, CONFIGURACION_CLAVE) == 0){
+			token = strtok(NULL, SEPARADOR);
+			if(token != NULL){
+				if(existe_archivo(token)){
+					hay_configuracion = true;
+					strcpy(ruta_configuracion, token);
+				}else{
+					hay_errores = true;
+				}
+			}else{
+				printf("Debe ingresar el nombre de un archivo .txt para guardar la configuracion.\n");
+				hay_errores = true;
+			}
+		}else if(strcmp(token, GRABACION_CLAVE) == 0){
+			token = strtok(NULL, SEPARADOR);
+			if(token != NULL){
+				if(es_dat_valido(token)){
+					hay_que_grabar = true;
+					strcpy(ruta_grabacion, token);
+				}else{
+					hay_errores = true;
+				}
+			}else{
+				printf("Debe ingresar el nombre de un archivo .dat para guardar la grabación.\n");
+				hay_errores = true;
+			}
+		}
+		i++;
+	}
+	if(!hay_errores){
+		if(hay_configuracion){
+			printf("Se obtendrá la config de: %s.\n", ruta_configuracion);
+		}else{
+			strcpy(ruta_configuracion, POR_DEFECTO_STRING);
+		}
+		if(hay_que_grabar){
+			printf("Se grabará la partida en: %s.\n", ruta_grabacion);
+		}else{
+			strcpy(ruta_grabacion, POR_DEFECTO_STRING);
+		}
+		if(hay_configuracion || hay_que_grabar){
+			detener_el_tiempo(2);
+		}
+		jugar(ruta_configuracion, ruta_grabacion);
+	}
 }

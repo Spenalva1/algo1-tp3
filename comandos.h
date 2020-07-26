@@ -60,6 +60,31 @@ typedef struct caminos{
 /*
 *
 */
+void comando_jugar(int argc, char* argv[]);
+
+/*
+*
+*/
+void comando_poneme_la_repe(int argc, char* argv[]);
+
+/*
+*
+*/
+void comando_crear_configuracion(int argc, char* argv[]);
+
+/*
+*
+*/
+void comando_crear_camino(int argc, char* argv[]);
+
+/*
+*
+*/
+void comando_ranking(int argc, char* argv[]);
+
+/*
+*
+*/
 int calcular_puntaje(int nivel_actual, configuracion_t configuracion, int orcos_muertos[4]);
 
 /*

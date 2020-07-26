@@ -40,28 +40,11 @@
 #define POR_DEFECTO_STRING "-1"
 #define YA_ASIGNADO_CHAR 'Y'
 #define YA_ASIGNADO -1
-#define CLAVE_RESISTENCIA_TORRES "RESISTENCIA_TORRES"
-#define CLAVE_ENANOS_INICIO "ENANOS_INICIO"
-#define CLAVE_ELFOS_INICIO "ELFOS_INICIO"
-#define CLAVE_ENANOS_EXTRA "ENANOS_EXTRA"
-#define CLAVE_ELFOS_EXTRA "ELFOS_EXTRA"
-#define CLAVE_ENANOS_ANIMO "ENANOS_ANIMO"
-#define CLAVE_ELFOS_ANIMO "ELFOS_ANIMO"
-#define CLAVE_VELOCIDAD "VELOCIDAD"
-#define CLAVE_CAMINOS "CAMINOS"
-#define RANKING "ranking"
-#define CAMINO "crear_camino"
-#define CONFIGURACION "crear_configuracion"
-#define CONFIGURACION_CLAVE "config"
-#define LISTAR_CLAVE "listar"
-#define LISTAR_MINIMO 1
-#define GRABACION_CLAVE "grabacion"
-#define REPE_CLAVE "poneme_la_repe"
-#define VELOCIDAD_CLAVE "velocidad"
-#define VELOCIDAD 1.0
-#define JUGAR "jugar"
-#define SEPARADOR "="
-
+#define COMANDO_RANKING "ranking"
+#define COMANDO_CONFIGURACION "crear_configuracion"
+#define COMANDO_CAMINO "crear_camino"
+#define COMANDO_REPE "poneme_la_repe"
+#define COMANDO_JUGAR "jugar"
 
 /*
 * Inicializara un nivel, cargando sus caminos, defensores y enemigos.
@@ -136,167 +119,23 @@ void mostrar_resultado(int estado, int puntaje);
 */
 void jugar(char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]);
 
-int main(int argc, char *argv[]){
+int main(int argc, char* argv[]){
     if(cantidad_parametros_valida(argc)){
         bool comando_valido = false;
-        if(strcmp(RANKING, argv[1]) == 0){
-			int i = 2;
-			bool hay_errores = false;
-			bool hay_cofiguracion = false;
-			int listar = LISTAR_TODOS;
-			char* token;
-            char ruta_configuracion[MAX_RUTA];
-			while(i <= MAX_COMANDOS && i < argc){
-				token = strtok(argv[i], SEPARADOR);
-				if(strcmp(token, CONFIGURACION_CLAVE) == 0){
-					token = strtok(NULL, SEPARADOR);
-					hay_cofiguracion = true;
-					if(token != NULL){
-						if(existe_archivo(token)){
-							strcpy(ruta_configuracion, token);
-						}else{
-							hay_errores = true;
-						}
-					}else{
-						printf("Debe ingresar el archivo de la configuración\n");
-						hay_errores = true;
-					}
-				}else if(strcmp(token, LISTAR_CLAVE) == 0){
-					token = strtok(NULL, SEPARADOR);
-					if(token != NULL){
-						listar = atoi(token);
-						if(listar < LISTAR_MINIMO){
-							printf("El valor a listar debe ser mayor o igual a %d\n", LISTAR_MINIMO);
-							hay_errores = true;
-						}
-					}else{
-						printf("Debe ingresar el valor a listar.\n");
-						hay_errores = true;
-					}
-				}	
-				i++;
-			}
-			if(!hay_cofiguracion){
-				strcpy(ruta_configuracion, POR_DEFECTO_STRING);
-			}
-            if(!hay_errores){
-				mostrar_ranking(ruta_configuracion, listar);
-			}
+        if(strcmp(COMANDO_RANKING, argv[1]) == 0){
+			comando_ranking(argc, argv);
             comando_valido = true;
-        }else if(strcmp(CAMINO, argv[1]) == 0){
-            if(argc > 2){
-                if(es_txt_valido(argv[2])){
-                    crear_camino(argv[2]);
-                }
-            }else{
-                printf("Debe ingresar el nombre de archivo para guardar el camino.\n");
-            }
+        }else if(strcmp(COMANDO_CAMINO, argv[1]) == 0){
+			comando_crear_camino(argc, argv);
             comando_valido = true;
-        }else if(strcmp(CONFIGURACION, argv[1]) == 0){
-            if(argc > 2){
-                if(es_txt_valido(argv[2])){
-                    crear_configuracion(argv[2]);
-                }
-            }else{
-                printf("Debe ingresar el nombre de archivo para guardar la configuración.\n");
-            }
+        }else if(strcmp(COMANDO_CONFIGURACION, argv[1]) == 0){
+			comando_crear_configuracion(argc, argv);
             comando_valido = true;
-        }else if(strcmp(REPE_CLAVE, argv[1]) == 0){
-			int i = 2;
-			bool hay_errores = false;
-			bool hay_grabacion = false;
-			float velocidad = VELOCIDAD;
-			char* token;
-            char ruta_grabacion[MAX_RUTA];
-			while(i <= MAX_COMANDOS && i < argc){
-				token = strtok(argv[i], SEPARADOR);
-				if(strcmp(token, GRABACION_CLAVE) == 0){
-					token = strtok(NULL, SEPARADOR);
-					hay_grabacion = true;
-					if(token != NULL){
-						if(existe_archivo(token)){
-							strcpy(ruta_grabacion, token);
-						}else{
-							hay_errores = true;
-						}
-					}else{
-						printf("Debe ingresar el archivo que contiene la grabacion\n");
-						hay_errores = true;
-					}
-				}else if(strcmp(token, VELOCIDAD_CLAVE) == 0){
-					token = strtok(NULL, SEPARADOR);
-					if(token != NULL){
-						velocidad = (float)atof(token);
-					}else{
-						printf("Debe ingresar el valor de la velocidad.\n");
-						hay_errores = true;
-					}
-				}	
-				i++;
-			}
-			if(!hay_grabacion){
-				printf("Debe ingresar el nombre del archivo de la repetición.\n");
-				hay_errores = true;
-			}
-            if(!hay_errores){
-				mostrar_repeticion(ruta_grabacion, velocidad);
-			}
+        }else if(strcmp(COMANDO_REPE, argv[1]) == 0){
+			comando_poneme_la_repe(argc, argv);
             comando_valido = true;
-        }else if(strcmp(JUGAR, argv[1]) == 0){
-            int i = 2;
-            bool hay_que_grabar = false;
-            bool hay_configuracion = false;
-            bool hay_errores = false;
-            char ruta_grabacion[MAX_RUTA];
-            char ruta_configuracion[MAX_RUTA];
-            char* token;
-            while(i <= MAX_COMANDOS && i < argc){
-                token = strtok(argv[i], SEPARADOR);
-                if(strcmp(token, CONFIGURACION_CLAVE) == 0){
-                    token = strtok(NULL, SEPARADOR);
-					if(token != NULL){
-						if(existe_archivo(token)){
-							hay_configuracion = true;
-							strcpy(ruta_configuracion, token);
-						}else{
-							hay_errores = true;
-						}
-					}else{
-						printf("Debe ingresar el nombre de un archivo .txt para guardar la configuracion.\n");
-						hay_errores = true;
-					}
-                }else if(strcmp(token, GRABACION_CLAVE) == 0){
-                    token = strtok(NULL, SEPARADOR);
-					if(token != NULL){
-						if(es_dat_valido(token)){
-							hay_que_grabar = true;
-							strcpy(ruta_grabacion, token);
-						}else{
-							hay_errores = true;
-						}
-					}else{
-						printf("Debe ingresar el nombre de un archivo .dat para guardar la grabación.\n");
-						hay_errores = true;
-					}
-                }
-                i++;
-            }
-            if(!hay_errores){
-                if(hay_configuracion){
-                    printf("Se obtendrá la config de: %s.\n", ruta_configuracion);
-                }else{
-                    strcpy(ruta_configuracion, POR_DEFECTO_STRING);
-                }
-                if(hay_que_grabar){
-                    printf("Se grabará la partida en: %s.\n", ruta_grabacion);
-                }else{
-                    strcpy(ruta_grabacion, POR_DEFECTO_STRING);
-                }
-				if(hay_configuracion || hay_que_grabar){
-	                detener_el_tiempo(2);
-				}
-                jugar(ruta_configuracion, ruta_grabacion);
-            }
+        }else if(strcmp(COMANDO_JUGAR, argv[1]) == 0){
+			comando_jugar(argc, argv);
             comando_valido = true;
         }
         if(!comando_valido){
