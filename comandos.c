@@ -81,13 +81,16 @@
 #define VELOCIDAD 0.5
 #define MULTIPLICADOR_ORCOS_MUERTOS 1000
 #define MAX_NOMBRE 50
+#define FORMATO_CAMINOS "%[^\n]\n"
+#define FORMATO_COORDENADAS "%d;%d\n"
 #define NO_HAY_REGISTROS -1
 #define SEPARADOR "="
-
-typedef struct ranking{
-    char nombre[MAX_NOMBRE];
-    int puntaje;
-} ranking_t;
+#define FORMATO_TORRES "%s=%d,%d\n"
+#define FORMATO_DEFENSORES_INICIO "%s=%d,%d,%d,%d\n"
+#define FORMATO_DEFENSORES_EXTRAS "%s=%d,%d,%d\n"
+#define FORMATO_ANIMOS "%s=%d,%d\n"
+#define FORMATO_VELOCIDAD "%s=%f\n"
+#define FORMATO_CAMINOS_RUTA "%s=%s\n"
 
 typedef struct nivel_caminos {
     int numero_nivel;
@@ -201,76 +204,76 @@ void cargar_caminos_desde_archivo(caminos_t* caminos, char ruta[MAX_RUTA]){
 	FILE* archivo = fopen (ruta, "r");
 	char coordenada[MAX_RUTA];
     char* token;
-	fscanf(archivo, "%[^\n]\n", coordenada);
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 
 	caminos->tope_camino_1_nivel_1 = 0;
 	caminos->tope_camino_2_nivel_1 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	while (strcmp(coordenada, "NIVEL=2")){
 		token = strtok(coordenada, ";");
 		caminos->camino_1_nivel_1[caminos->tope_camino_1_nivel_1].fil = atoi(token);
         token = strtok(NULL, ";");
 		caminos->camino_1_nivel_1[caminos->tope_camino_1_nivel_1].col = atoi(token);
 		(caminos->tope_camino_1_nivel_1)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
+		fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	}
 
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	caminos->tope_camino_1_nivel_2 = 0;
 	caminos->tope_camino_2_nivel_2 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	while (strcmp(coordenada, "NIVEL=3")){
 		token = strtok(coordenada, ";");
 		caminos->camino_2_nivel_2[caminos->tope_camino_2_nivel_2].fil = atoi(token);
         token = strtok(NULL, ";");
 		caminos->camino_2_nivel_2[caminos->tope_camino_2_nivel_2].col = atoi(token);
 		(caminos->tope_camino_2_nivel_2)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
+		fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	}
 
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	caminos->tope_camino_1_nivel_3 = 0;
 	caminos->tope_camino_2_nivel_3 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	while (strcmp(coordenada, "CAMINO=2")){
 		token = strtok(coordenada, ";");
 		caminos->camino_1_nivel_3[caminos->tope_camino_1_nivel_3].fil = atoi(token);
         token = strtok(NULL, ";");
 		caminos->camino_1_nivel_3[caminos->tope_camino_1_nivel_3].col = atoi(token);
 		(caminos->tope_camino_1_nivel_3)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
+		fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	}
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	while (strcmp(coordenada, "NIVEL=4")){
 		token = strtok(coordenada, ";");
 		caminos->camino_2_nivel_3[caminos->tope_camino_2_nivel_3].fil = atoi(token);
         token = strtok(NULL, ";");
 		caminos->camino_2_nivel_3[caminos->tope_camino_2_nivel_3].col = atoi(token);
 		(caminos->tope_camino_2_nivel_3)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
+		fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	}
 	
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	caminos->tope_camino_1_nivel_4 = 0;
 	caminos->tope_camino_2_nivel_4 = 0;
-	fscanf(archivo, "%[^\n]\n", coordenada);
+	fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	while (strcmp(coordenada, "CAMINO=2")){
 		token = strtok(coordenada, ";");
 		caminos->camino_1_nivel_4[caminos->tope_camino_1_nivel_4].fil = atoi(token);
         token = strtok(NULL, ";");
 		caminos->camino_1_nivel_4[caminos->tope_camino_1_nivel_4].col = atoi(token);
 		(caminos->tope_camino_1_nivel_4)++;
-		fscanf(archivo, "%[^\n]\n", coordenada);
+		fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	}
-	int coordenada_leida = fscanf(archivo, "%[^\n]\n", coordenada);
+	int coordenada_leida = fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	while (coordenada_leida == 1){
 		token = strtok(coordenada, ";");
 		caminos->camino_2_nivel_4[caminos->tope_camino_2_nivel_4].fil = atoi(token);
         token = strtok(NULL, ";");
 		caminos->camino_2_nivel_4[caminos->tope_camino_2_nivel_4].col = atoi(token);
 		(caminos->tope_camino_2_nivel_4)++;
-		coordenada_leida = fscanf(archivo, "%[^\n]\n", coordenada);
+		coordenada_leida = fscanf(archivo, FORMATO_CAMINOS, coordenada);
 	}
 
 	fclose(archivo);
@@ -393,7 +396,9 @@ static void insertar_camino_en_tablero(char tablero[MAX_COLUMNAS][MAX_FILAS], co
 }
 
 /*
-*
+* Se espera un tablero con sus estructuras validas y pos_entrada y pos_torre unas posiciones validas del tablero
+* Guarda el caracter ENTRADA en la posicion pos_entrada.
+* Guarda el caracter TORRE en la posicion pos_torre.
 */
 void insertar_extermos_camino(char tablero[MAX_COLUMNAS][MAX_FILAS], coordenada_t pos_entrada, coordenada_t pos_torre){
     tablero[pos_entrada.fil][pos_entrada.col] = ENTRADA;
@@ -412,7 +417,8 @@ static void inicializar_tablero(char tablero[MAX_COLUMNAS][MAX_FILAS], int tope_
 }
 
 /*
-*
+* Muestra en pantalla el camino recivido en nivel_caminos
+* camino recive valores 1 o 2
 */
 void mostrar_camino(nivel_caminos_t nivel_caminos, int camino){
 	system("clear");
@@ -491,7 +497,8 @@ bool camino_valido(coordenada_t camino[MAX_LONGITUD_CAMINO], int tope_camino, co
 }
 
 /*
-*
+* Devuelve TRUE si coordenada posee una posicion valida en el camino recibido dependiendo el nivel de nivel_caminos
+* Se reciben valores 1 o 2 de camino
 */
 bool entrada_valida(coordenada_t coordenada, nivel_caminos_t nivel_caminos, int camino){
     bool entrada_valida = true;
@@ -535,7 +542,8 @@ bool entrada_valida(coordenada_t coordenada, nivel_caminos_t nivel_caminos, int 
 }
 
 /*
-*
+* guada en nivel_caminos la posicion coordenada en el camino de camino_numero.
+* Se espera que coordenada posea una posicion valida del camino.
 */
 void insertar_coordenada_en_camino(nivel_caminos_t* nivel_caminos, coordenada_t coordenada, int camino_numero){
     if(camino_numero == 1){
@@ -548,7 +556,8 @@ void insertar_coordenada_en_camino(nivel_caminos_t* nivel_caminos, coordenada_t 
 }
 
 /*
-*
+* Devuelve TRUE si coordenada posee una posicion valida en el camino recibido dependiendo el nivel de nivel_caminos
+* Se reciben valores 1 o 2 de camino
 */
 bool torre_valida(nivel_caminos_t nivel_caminos, int camino_numero){
     bool torre_valida = false;
@@ -596,7 +605,7 @@ bool torre_valida(nivel_caminos_t nivel_caminos, int camino_numero){
 }
 
 /*
-*
+* Devuelve true si movimiento corresponde a una coordenada válida. Devuelve false en caso contrario.
 */
 bool insertar_movimiento(char movimiento, nivel_caminos_t* nivel_caminos, int camino_numero){
     bool movimiento_valido = false;
@@ -684,7 +693,7 @@ bool insertar_movimiento(char movimiento, nivel_caminos_t* nivel_caminos, int ca
 }
 
 /*
-*
+* Pide al usuario un caracter hasta qué este corresponda a un movimiento válido, devuelve true si el caracter valido ingresado es TORRE
 */
 bool pedir_movimiento(nivel_caminos_t* nivel_caminos, int camino_numero){
     char movimiento;
@@ -699,7 +708,8 @@ bool pedir_movimiento(nivel_caminos_t* nivel_caminos, int camino_numero){
 
 
 /*
-*
+* Pide al usuario que ingrese un camino a base de caracteres que representan las posiciones arriba, derecha, izquierda y abajo
+* Devuelve true si el camino pudo ser creado exitosamente. Devuelve false en caso contrario
 */
 bool pedir_camino(nivel_caminos_t* nivel_caminos, int camino){
     mostrar_camino(*nivel_caminos, camino);
@@ -728,7 +738,7 @@ bool pedir_camino(nivel_caminos_t* nivel_caminos, int camino){
 }
 
 /*
-*
+* Define los valores de nivel_caminos dependiendo el nivel obtenido de dicha estructura en nivel_caminos.numero_nivel
 */
 void definir_limites(nivel_caminos_t* nivel_caminos){
 	switch (nivel_caminos->numero_nivel){
@@ -758,7 +768,7 @@ void definir_limites(nivel_caminos_t* nivel_caminos){
 */
 void escribir_coordenadas_en_archivo(FILE* archivo, coordenada_t camino[MAX_LONGITUD_CAMINO], int tope_camino){
     for(int i = 0; i < tope_camino; i++){
-        fprintf(archivo, "%d;%d\n", camino[i].fil, camino[i].col);
+        fprintf(archivo, FORMATO_COORDENADAS, camino[i].fil, camino[i].col);
     }
 }
 
@@ -767,20 +777,21 @@ void escribir_coordenadas_en_archivo(FILE* archivo, coordenada_t camino[MAX_LONG
 */
 void escribir_configuracion_en_archivo(char ruta[MAX_RUTA], configuracion_t configuracion){
     FILE* archivo = fopen(ruta, "w");
-    fprintf(archivo, "%s=%d,%d\n", CLAVE_RESISTENCIA_TORRES, configuracion.resistencia_torre_1, configuracion.resistencia_torre_2);
-    fprintf(archivo, "%s=%d,%d,%d,%d\n", CLAVE_ENANOS_INICIO, configuracion.enanos_nivel_1, configuracion.enanos_nivel_2, configuracion.enanos_nivel_3, configuracion.enanos_nivel_4);
-    fprintf(archivo, "%s=%d,%d,%d,%d\n", CLAVE_ELFOS_INICIO, configuracion.elfos_nivel_1, configuracion.elfos_nivel_2, configuracion.elfos_nivel_3, configuracion.elfos_nivel_4);
-    fprintf(archivo, "%s=%d, %d, %d\n", CLAVE_ENANOS_EXTRA, configuracion.enanos_extra, configuracion.enanos_coste_torre_1, configuracion.enanos_coste_torre_2);
-    fprintf(archivo, "%s=%d, %d, %d\n", CLAVE_ELFOS_EXTRA, configuracion.elfos_extra, configuracion.elfos_coste_torre_1, configuracion.elfos_coste_torre_2);
-    fprintf(archivo, "%s=%d, %d\n", CLAVE_ENANOS_ANIMO, configuracion.enanos_fallo, configuracion.enanos_critico);
-    fprintf(archivo, "%s=%d, %d\n", CLAVE_ELFOS_ANIMO, configuracion.elfos_fallo, configuracion.elfos_critico);
-    fprintf(archivo, "%s=%f\n", CLAVE_VELOCIDAD, configuracion.velocidad_juego);
-    fprintf(archivo, "%s=%s\n", CLAVE_CAMINOS, configuracion.caminos);
+    fprintf(archivo, FORMATO_TORRES, CLAVE_RESISTENCIA_TORRES, configuracion.resistencia_torre_1, configuracion.resistencia_torre_2);
+    fprintf(archivo, FORMATO_DEFENSORES_INICIO, CLAVE_ENANOS_INICIO, configuracion.enanos_nivel_1, configuracion.enanos_nivel_2, configuracion.enanos_nivel_3, configuracion.enanos_nivel_4);
+    fprintf(archivo, FORMATO_DEFENSORES_INICIO, CLAVE_ELFOS_INICIO, configuracion.elfos_nivel_1, configuracion.elfos_nivel_2, configuracion.elfos_nivel_3, configuracion.elfos_nivel_4);
+    fprintf(archivo, FORMATO_DEFENSORES_EXTRAS, CLAVE_ENANOS_EXTRA, configuracion.enanos_extra, configuracion.enanos_coste_torre_1, configuracion.enanos_coste_torre_2);
+    fprintf(archivo, FORMATO_DEFENSORES_EXTRAS, CLAVE_ELFOS_EXTRA, configuracion.elfos_extra, configuracion.elfos_coste_torre_1, configuracion.elfos_coste_torre_2);
+    fprintf(archivo, FORMATO_ANIMOS, CLAVE_ENANOS_ANIMO, configuracion.enanos_fallo, configuracion.enanos_critico);
+    fprintf(archivo, FORMATO_ANIMOS, CLAVE_ELFOS_ANIMO, configuracion.elfos_fallo, configuracion.elfos_critico);
+    fprintf(archivo, FORMATO_VELOCIDAD, CLAVE_VELOCIDAD, configuracion.velocidad_juego);
+    fprintf(archivo, FORMATO_CAMINOS_RUTA, CLAVE_CAMINOS, configuracion.caminos);
     fclose(archivo);
 }
 
 /*
-*
+* Escribe los caminos de un nivel en el archivo recibido
+* Se espera que el archivo ya esté abierto en modo escritura
 */
 void escribir_caminos_en_archivo(FILE* archivo, nivel_caminos_t nivel_caminos){
     switch(nivel_caminos.numero_nivel){
@@ -848,7 +859,6 @@ void crear_camino(char* nombre_archivo){
                 nivel_caminos.tope_camino_2 = 0;
             }
         }
-        //DESPUES DE ACA SE BORRA EL CAMINO, HABRIA QUE ESCRIBIRLO
         escribir_caminos_en_archivo(archivo, nivel_caminos);
         (nivel_caminos.numero_nivel)++;
         nivel_caminos.tope_camino_1 = 0;
@@ -860,49 +870,65 @@ void crear_camino(char* nombre_archivo){
 }
 
 /*
-*
+* Devuelve true si resistencia es mayor o igual a RESISTENCIA_TORRE_MINIMA y menor o igual a RESISTENCIA_TORRE_MÁXIMA.
+* Devuelve true tambien si es igual a POR_DEFECTO.
+* Devuelve false en caso contrario.
 */
 bool resistencia_torre_valida(int resistencia){
     return (((resistencia >= RESISTENCIA_TORRE_MINIMA) && (resistencia <= RESISTENCIA_TORRE_MAXIMA)) || (resistencia == POR_DEFECTO));
 }
 
 /*
-*
+* Devuelve true si defensores es mayor o igual a DEFENSORES_MINIMOS y menor o igual a DEFENSORES_MAXIMOS
+* Devuelve true tambien si es igual a POR_DEFECTO
+* Devuelve false en caso contrario.
 */
 bool cantidad_defensores_valida(int defensores){
     return (((defensores >= DEFENSORES_MINIMOS) && (defensores <= DEFENSORES_MAXIMOS)) || (defensores == POR_DEFECTO));
 }
 
 /*
-*
+* Devuelve true si extra es mayor o igual a EXTRAS_MINIMOS y menor o igual a EXTRAS_MAXIMOS
+* Devuelve true tambien si es igual a POR_DEFECTO
+* Devuelve false en caso contrario.
 */
 bool cantidad_extra_valida(int extra){
     return (((extra >= EXTRAS_MINIMOS) && (extra <= EXTRAS_MAXIMOS)) || (extra == POR_DEFECTO));
 }
 
 /*
-*
+* Devuelve true si extra es mayor o igual a COSTE_EXTRAS_MINIMO y menor o igual a COSTE_EXTRAS_MAXIMO
+* Devuelve true tambien si es igual a POR_DEFECTO
+* Devuelve false en caso contrario.
 */
 bool coste_extra_valido(int extra){
     return (((extra >= COSTE_EXTRAS_MINIMO) && (extra <= COSTE_EXTRAS_MAXIMO)) || (extra == POR_DEFECTO));
 }
 
 /*
-*
+* Devuelve true si porcentaje es mayor o igual a PORCENTAJE_MINIMO y menor o igual a PORCENTAJE_MAXIMO
+* Devuelve true tambien si es igual a POR_DEFECTO
+* Devuelve false en caso contrario.
 */
 bool porcentaje_valido(int porcentaje){
     return (((porcentaje >= PORCENTAJE_MINIMO) && (porcentaje <= PORCENTAJE_MAXIMO)) || (porcentaje == POR_DEFECTO));
 }
 
 /*
-*
+* Devuelve true si velocidad es mayor o igual a VELOCIDAD_MINIMA y menor o igual a VELOCIDAD_MAXIMA
+* Devuelve true tambien si es igual a POR_DEFECTO
+* Devuelve false en caso contrario.
 */
 bool velocidad_valida(float velocidad){
     return (((velocidad >= VELOCIDAD_MINIMA) && (velocidad <= VELOCIDAD_MAXIMA)) || (velocidad == POR_DEFECTO));
 }
 
 /*
-*
+* verifica que la cadena de caracteres ingresadas en "ruta" corresponda a un archivo que pueda
+* ser abierto.
+* Devuelve TRUE en caso de que exista.
+* Devuelve False en caso de que el archivo no se pueda abrir o si el largo de la cadena
+* es menor a 4 o mayor a 100
 */
 bool ruta_caminos_valida(char ruta[MAX_RUTA]){
     if(strcmp(ruta, "-1") == 0){
@@ -1102,7 +1128,8 @@ int orcos_muertos_en_nivel(nivel_t nivel){
 }
 
 /*
-*
+* Recibe un string y crea uno nuevo en base al recibido agregandole el prefijo RUTA_RANKING_BASE y el sufijo CSV
+* En caso de que el string recibido sea igual a POR_DEFECTO_STRING, el nuevo string solo esta formado por el prefijo y el sufijo
 */
 void construir_ruta_ranking(char config[MAX_RUTA], char ruta[MAX_RUTA]){
     strcpy(ruta, RUTA_RANKING_BASE);

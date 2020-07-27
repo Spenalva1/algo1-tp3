@@ -1,6 +1,6 @@
 #include "comandos.h"
-#include "animos.h"
 #include "defendiendo_torres.h"
+#include "animos.h"
 #include "utiles.h"
 #include <stdio.h>
 #include <time.h>
