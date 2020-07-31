@@ -42,7 +42,7 @@
 #define PORCENTAJE_MAXIMO 99
 #define POR_DEFECTO -1
 #define POR_DEFECTO_STRING "-1"
-#define VELOCIDAD_MINIMA 0.25
+#define VELOCIDAD_MINIMA 0.125
 #define VELOCIDAD_MAXIMA 5.0
 #define CLAVE_RESISTENCIA_TORRES "RESISTENCIA_TORRES"
 #define CLAVE_ENANOS_INICIO "ENANOS_INICIO"
@@ -952,14 +952,14 @@ void crear_configuracion(char* nombre_archivo){
     printf("Resistencia torre 1: ");
     scanf("%d", &(configuracion.resistencia_torre_1));
     while(!resistencia_torre_valida(configuracion.resistencia_torre_1)){
-        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", RESISTENCIA_TORRE_MINIMA, RESISTENCIA_TORRE_MINIMA);
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", RESISTENCIA_TORRE_MINIMA, RESISTENCIA_TORRE_MAXIMA);
         scanf("%d", &(configuracion.resistencia_torre_1));
     }
 
     printf("Resistencia torre 2: ");
     scanf("%d", &(configuracion.resistencia_torre_2));
     while(!resistencia_torre_valida(configuracion.resistencia_torre_2)){
-        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", RESISTENCIA_TORRE_MINIMA, RESISTENCIA_TORRE_MINIMA);
+        printf("Debe ingresar un número entre %d y %d inclusive ambos: ", RESISTENCIA_TORRE_MINIMA, RESISTENCIA_TORRE_MAXIMA);
         scanf("%d", &(configuracion.resistencia_torre_2));
     }
 

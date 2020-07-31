@@ -115,7 +115,10 @@ bool quiere_defensor_extra(char tipo, configuracion_t configuracion);
 void mostrar_resultado(int estado, int puntaje);
 
 /*
-*
+* Permite al usuario jugar al juego, interactuando con él y mostrando a cada turno todos los componentes del mismo.
+* ruta_configuracion posee la ruta del archivo del cual se obtendran los valores iniciales de los distintos componentes del juego. Se espera que sea la ruta
+* de un archivo existente y listo para abrir y leer. En caso de que se reciba un "-1" en dicho valor, se utilizara la configuracion por defecto.
+* ruta_grabacion posee la ruta donde se guardará la grabacion de la partida (en caso de recibir una ruta). Si el valor es "-1" la partida no se grabará 
 */
 void jugar(char ruta_configuracion[MAX_RUTA], char ruta_grabacion[MAX_RUTA]);
 
